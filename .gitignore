@@ -23,5 +23,4 @@ Thumbs.db
 # cobertura de tests
 coverage/
 
-# carpeta con otro repo embebido (caso tuyo)
-mi-app-servicios/
+
