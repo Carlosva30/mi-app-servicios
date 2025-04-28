@@ -7,7 +7,8 @@ const PantallaSolicitudesGuardadas = ({ onVolver }) => {
 
   useEffect(() => {
     axios.get('/solicitudes') //  no necesita la URL completa
-      .then((res) => {
+      .then((res) => {localStorage.getItem('token')
+
         setSolicitudes(res.data.solicitudes || []);
       })
       .catch((err) => {
