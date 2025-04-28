@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
-import PantallaInicio from './componentes/PantallaInicio';
-import PantallaRegistro from './componentes/PantallaRegistro';
-import PantallaServicios from './componentes/PantallaServicios';
-import PantallaSolicitud from './componentes/PantallaSolicitud';
-import PantallaPago from './componentes/PantallaPago';
-import PantallaSeguimiento from './componentes/PantallaSeguimiento';
-import PantallaFinal from './componentes/PantallaFinal';
-import PantallaSolicitudesGuardadas from './componentes/PantallaSolicitudesGuardadas';
-import Login from './componentes/Login'; // Ojo: tu carpeta es "componentes"
+
+import Login from './componentes/auth/Login';
+import PantallaRegistro from './componentes/auth/PantallaRegistro';
+
+import PantallaInicio from './componentes/inicio/PantallaInicio';
+import PantallaFinal from './componentes/inicio/PantallaFinal';
+
+import PantallaServicios from './componentes/servicios/PantallaServicios';
+import PantallaSolicitud from './componentes/servicios/PantallaSolicitud';
+import PantallaSolicitudesGuardadas from './componentes/servicios/PantallaSolicitudesGuardadas';
+import PantallaSeguimiento from './componentes/servicios/PantallaSeguimiento';
+
+import PantallaPago from './componentes/pagos/PantallaPago';
+
 import './App.css';
 
 function App() {
-  const [pantalla, setPantalla] = useState('login'); // 👈 iniciamos en login
+  const [pantalla, setPantalla] = useState('login'); // ← ahora inicia en Login
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [servicio, setServicio] = useState('');
@@ -23,72 +28,70 @@ function App() {
 
   return (
     <div className="App">
-      {/* Pantalla de LOGIN */}
-      <div className={getClase('login')}>
-        <Login onLoginExitoso={() => setPantalla('inicio')} />
-      </div>
 
-      {/* Pantalla de INICIO */}
-      <div className={getClase('inicio')}>
-      <PantallaInicio
-         onLogin={() => setPantalla('login')}
-         onRegistro={() => setPantalla('registro')}
-         onVerSolicitudes={() => setPantalla('verSolicitudes')}
+      {/* LOGIN */}
+      {pantalla === 'login' && (
+        <Login
+          onRegistro={() => setPantalla('registro')}
+          onLoginExitoso={() => setPantalla('inicio')}
         />
-      </div>
+      )}
 
-      {/* Registro de usuario */}
-      <div className={getClase('registro')}>
+      {/* PANEL DE BIENVENIDA */}
+      {pantalla === 'inicio' && (
+        <PantallaInicio
+          onVerServicios={() => setPantalla('servicios')}
+          onVerSolicitudes={() => setPantalla('verSolicitudes')}
+          onLogout={() => setPantalla('login')}
+        />
+      )}
+
+      {/* REGISTRO */}
+      {pantalla === 'registro' && (
         <PantallaRegistro
           onRegistro={() => setPantalla('servicios')}
-          setEmail={setEmail}
-          setPassword={setPassword}
         />
-      </div>
+      )}
 
-      {/* Selección de servicios */}
-      <div className={getClase('servicios')}>
+      {/* SELECCIÓN DE SERVICIOS */}
+      {pantalla === 'servicios' && (
         <PantallaServicios
           onSeleccionar={(serv) => {
             setServicio(serv);
             setPantalla('solicitud');
           }}
         />
-      </div>
+      )}
 
-      {/* Descripción de la solicitud */}
-      <div className={getClase('solicitud')}>
+      {/* DESCRIPCIÓN DE LA SOLICITUD */}
+      {pantalla === 'solicitud' && (
         <PantallaSolicitud
           email={email}
           servicio={servicio}
           setDescripcion={setDescripcion}
           onConfirmar={() => setPantalla('pago')}
         />
-      </div>
+      )}
 
-      {/* Vista de solicitudes guardadas */}
-      <div className={getClase('verSolicitudes')}>
+      {/* SOLICITUDES GUARDADAS */}
+      {pantalla === 'verSolicitudes' && (
         <PantallaSolicitudesGuardadas onVolver={() => setPantalla('inicio')} />
-      </div>
+      )}
 
-      {/* Pantalla de pago */}
-      <div className={getClase('pago')}>
+      {/* PAGO */}
+      {pantalla === 'pago' && (
         <PantallaPago onPagar={() => setPantalla('seguimiento')} />
-      </div>
+      )}
 
-      {/* Seguimiento del estado del servicio */}
-      <div className={getClase('seguimiento')}>
+      {/* SEGUIMIENTO */}
+      {pantalla === 'seguimiento' && (
         <PantallaSeguimiento onFinalizar={() => setPantalla('final')} />
-      </div>
+      )}
 
-      {/* Pantalla final de agradecimiento */}
-      <div className={getClase('final')}>
-        <PantallaFinal
-          email={email}
-          servicio={servicio}
-          descripcion={descripcion}
-        />
-      </div>
+      {/* FINAL */}
+      {pantalla === 'final' && (
+        <PantallaFinal onLogout={() => setPantalla('login')} />
+      )}
     </div>
   );
 }

@@ -22,6 +22,9 @@ mongoose.connect('mongodb+srv://appServicios:Sarasara2.@cluster0.nhorckw.mongodb
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
+const solicitudRoutes = require('./routes/solicitudes');
+app.use('/api/solicitudes', solicitudRoutes);
+
 // Servidor en marcha
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);

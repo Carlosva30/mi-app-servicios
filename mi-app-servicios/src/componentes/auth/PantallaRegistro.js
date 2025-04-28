@@ -1,41 +1,57 @@
 import React, { useState } from 'react';
+import axios from '../../api/axios'; // ✅ Importando instancia de axios que incluye el token automáticamente
 
-const PantallaRegistro = ({ onRegistro, setEmail, setPassword }) => {
-  const [localEmail, setLocalEmail] = useState('');
-  const [localPassword, setLocalPassword] = useState('');
+const PantallaRegistro = ({ onRegistro }) => {
+  const [nombre, setNombre] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [contraseña, setContraseña] = useState('');
+  const [mensaje, setMensaje] = useState('');
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setEmail(localEmail);         // guardar en App.js
-    setPassword(localPassword);   // guardar en App.js
-    onRegistro();                 // pasar a pantalla de servicios
+    try {
+      await axios.post('/auth/registro', { nombre, correo, contraseña });
+      if (onRegistro) onRegistro(); // Si se registra bien, avanza
+    } catch (error) {
+      setMensaje(error.response?.data?.mensaje || 'Error al registrarse');
+      console.error('❌ Error en el registro:', error);
+    }
   };
 
   return (
-    <div>
+    <div style={{ textAlign: 'center', padding: '30px' }}>
       <h2>Registro</h2>
       <form onSubmit={handleSubmit}>
-        <label htmlFor="email">Correo Electrónico</label>
+        <input
+          type="text"
+          placeholder="Tu nombre"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          required
+          style={{ display: 'block', marginBottom: '10px', width: '250px', padding: '10px' }}
+        />
+
         <input
           type="email"
-          id="email"
-          placeholder="Tu email"
-          value={localEmail}
-          onChange={(e) => setLocalEmail(e.target.value)}
+          placeholder="Correo electrónico"
+          value={correo}
+          onChange={(e) => setCorreo(e.target.value)}
           required
+          style={{ display: 'block', marginBottom: '10px', width: '250px', padding: '10px' }}
         />
 
-        <label htmlFor="password">Contraseña</label>
         <input
           type="password"
-          id="password"
-          placeholder="Tu contraseña"
-          value={localPassword}
-          onChange={(e) => setLocalPassword(e.target.value)}
+          placeholder="Contraseña"
+          value={contraseña}
+          onChange={(e) => setContraseña(e.target.value)}
           required
+          style={{ display: 'block', marginBottom: '20px', width: '250px', padding: '10px' }}
         />
 
-        <button type="submit">Registrarse</button>
+        <button type="submit" style={{ padding: '10px 20px' }}>Registrarse</button>
+
+        {mensaje && <p style={{ color: 'red', marginTop: '15px' }}>{mensaje}</p>}
       </form>
     </div>
   );
