@@ -13,6 +13,11 @@ const usuarioSchema = new mongoose.Schema({
   contraseña: {
     type: String,
     required: true
+  },
+  tipoUsuario: {
+    type: String,
+    enum: ['cliente', 'experto'],
+    required: true
   }
 });
 

@@ -10,7 +10,7 @@ const JWT_SECRET = 'mi_clave_secreta'; // más adelante lo pondremos en .env
 
 // Registro de usuario
 router.post('/registro', async (req, res) => {
-  const { nombre, correo, contraseña } = req.body;
+  const { nombre, correo, contraseña, tipoUsuario } = req.body;
 
   try {
     // Verificar si el correo ya existe
@@ -22,11 +22,12 @@ router.post('/registro', async (req, res) => {
     // Encriptar la contraseña
     const contraseñaSegura = await bcrypt.hash(contraseña, 10);
 
-    // Crear y guardar el nuevo usuario
+    // Crear y guardar el nuevo usuario con tipo
     const nuevoUsuario = new Usuario({
       nombre,
       correo,
-      contraseña: contraseñaSegura
+      contraseña: contraseñaSegura,
+      tipoUsuario
     });
 
     await nuevoUsuario.save();
@@ -34,55 +35,7 @@ router.post('/registro', async (req, res) => {
     res.status(201).json({ mensaje: 'Usuario registrado con éxito' });
 
   } catch (error) {
-    console.error('❌ Error al registrar:', error.message); // 👈 muestra el mensaje real del error
+    console.error('❌ Error al registrar:', error.message);
     res.status(500).json({ mensaje: 'Error al registrar' });
   }
 });
-
-// Inicio de sesión
-router.post('/login', async (req, res) => {
-  const { correo, contraseña } = req.body;
-
-
-  try {
-    const usuario = await Usuario.findOne({ correo });
-    if (!usuario) {
-      return res.status(400).json({ mensaje: 'Correo o contraseña incorrectos' });
-    }
-
-    const coincide = await bcrypt.compare(contraseña, usuario.contraseña);
-    if (!coincide) {
-      return res.status(400).json({ mensaje: 'Correo o contraseña incorrectos' });
-    }
-
-    // Generar token JWT
-    const token = jwt.sign(
-      { id: usuario._id, correo: usuario.correo },
-      JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    res.json({
-      mensaje: 'Inicio de sesión exitoso',
-      token,
-      usuario: {
-        nombre: usuario.nombre,
-        correo: usuario.correo
-      }
-    });
-
-  } catch (error) {
-    console.error('❌ Error al iniciar sesión:', error.message);
-    res.status(500).json({ mensaje: 'Error al iniciar sesión' });
-  }
-});
-
-
-router.get('/perfil', verificarToken, (req, res) => {
-    res.json({
-      mensaje: 'Accediste al perfil protegido',
-      usuario: req.usuario
-    });
-  });
-  
-module.exports = router;

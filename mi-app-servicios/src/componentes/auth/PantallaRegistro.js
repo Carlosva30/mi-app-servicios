@@ -1,18 +1,35 @@
 import React, { useState } from 'react';
-import axios from '../../api/axios'; // ✅ Importando instancia de axios que incluye el token automáticamente
+import axios from '../../api/axios';
 
 const PantallaRegistro = ({ onRegistro }) => {
   const [nombre, setNombre] = useState('');
   const [correo, setCorreo] = useState('');
   const [contraseña, setContraseña] = useState('');
+  const [tipoUsuario, setTipoUsuario] = useState('');
   const [mensaje, setMensaje] = useState('');
+  const [exito, setExito] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!tipoUsuario) {
+      setMensaje('Por favor selecciona si eres Cliente o Experto.');
+      setExito(false);
+      return;
+    }
+
     try {
-      await axios.post('/auth/registro', { nombre, correo, contraseña });
-      if (onRegistro) onRegistro(); // Si se registra bien, avanza
+      await axios.post('/auth/registro', { nombre, correo, contraseña, tipoUsuario });
+
+      setExito(true);
+      setMensaje('¡Usuario registrado exitosamente! ✅');
+
+      setTimeout(() => {
+        if (onRegistro) onRegistro(tipoUsuario); // ✅ le paso el tipo de usuario
+      }, 2000);
+
     } catch (error) {
+      setExito(false);
       setMensaje(error.response?.data?.mensaje || 'Error al registrarse');
       console.error('❌ Error en el registro:', error);
     }
@@ -49,9 +66,30 @@ const PantallaRegistro = ({ onRegistro }) => {
           style={{ display: 'block', marginBottom: '20px', width: '250px', padding: '10px' }}
         />
 
+        {/* Nuevo campo de selección */}
+        <select
+          value={tipoUsuario}
+          onChange={(e) => setTipoUsuario(e.target.value)}
+          required
+          style={{ width: '260px', padding: '10px', marginBottom: '20px' }}
+        >
+          <option value="">Selecciona tu tipo de usuario</option>
+          <option value="cliente">Cliente</option>
+          <option value="experto">Experto</option>
+        </select>
+
+        <br />
         <button type="submit" style={{ padding: '10px 20px' }}>Registrarse</button>
 
-        {mensaje && <p style={{ color: 'red', marginTop: '15px' }}>{mensaje}</p>}
+        {mensaje && (
+          <p style={{
+            color: exito ? 'green' : 'red',
+            marginTop: '15px',
+            fontWeight: 'bold'
+          }}>
+            {mensaje}
+          </p>
+        )}
       </form>
     </div>
   );
