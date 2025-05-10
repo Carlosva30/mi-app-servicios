@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Usuario = require('../models/Usuario');
 
-
 const router = express.Router();
 const JWT_SECRET = 'mi_clave_secreta'; // más adelante lo pondremos en .env
 
@@ -39,3 +38,6 @@ router.post('/registro', async (req, res) => {
     res.status(500).json({ mensaje: 'Error al registrar' });
   }
 });
+
+// Exportar el router
+module.exports = router;
