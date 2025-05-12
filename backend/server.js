@@ -19,6 +19,9 @@ app.use(cors({
 // ✅ Middleware para parsear JSON
 app.use(express.json());
 
+// ✅ Mostrar la URI para verificar si se está leyendo correctamente
+console.log("🧪 URI de conexión MongoDB:", process.env.MONGODB_URI);
+
 // ✅ Conexión a MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
