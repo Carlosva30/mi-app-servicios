@@ -147,3 +147,82 @@ Este proyecto usa la licencia MIT.
 ##  Autor
 
 Carlos Andrés Valencia Flórez – [@Carlosva30](https://github.com/Carlosva30)
+
+##  Instalación y ejecución local paso a paso
+
+###  Recomendación inicial
+
+Abre toda la carpeta del proyecto en **Visual Studio Code** (la que se llama `MI-APP-SERVICIOS`) para que puedas ver tanto el backend como el frontend.
+
+### Estructura del proyecto
+
+```
+MI-APP-SERVICIOS/
+├── backend/               → Contiene el servidor Node.js y la API
+└── mi-app-servicios/     → Contiene el proyecto React (interfaz de usuario)
+```
+
+---
+
+###  Ejecutar el Backend (API con Express)
+
+1. Abre **una terminal** en VS Code (puedes presionar `Ctrl + ñ` o hacer clic en el ícono `+` en la parte superior derecha de la terminal).
+2. Navega al backend con este comando:
+
+```bash
+cd backend
+```
+
+3. Asegúrate de tener un archivo `.env`. Si no lo tienes, créalo dando clic derecho sobre la carpeta `backend` → `Nuevo archivo`, y escribe exactamente `.env` como nombre. Dentro, pega lo siguiente:
+
+```env
+PORT=5000
+MONGODB_URI=mongodb+srv://<usuario>:<contraseña>@cluster0.nhorckw.mongodb.net/nowservices?retryWrites=true&w=majority
+JWT_SECRET=mi_clave_secreta
+```
+
+Reemplaza `<usuario>` y `<contraseña>` con tus credenciales reales de MongoDB Atlas.
+
+4. Instala las dependencias:
+
+```bash
+npm install
+```
+
+5. Inicia el servidor:
+
+```bash
+npm run dev
+```
+
+Verás un mensaje como:
+
+```
+🚀 Servidor corriendo en http://localhost:5000
+✅ Conectado a MongoDB Atlas
+```
+
+---
+
+###  Ejecutar el Frontend (React)
+
+1. Abre **otra terminal nueva** en VS Code haciendo clic en el ícono `+` en la esquina superior derecha de la terminal actual (o con `Ctrl + ñ` y cambia de terminal).
+2. Navega al frontend con este comando:
+
+```bash
+cd mi-app-servicios
+```
+
+3. Instala las dependencias:
+
+```bash
+npm install
+```
+
+4. Inicia la aplicación:
+
+```bash
+npm start
+```
+
+Se abrirá tu navegador automáticamente en `http://localhost:3000`.
