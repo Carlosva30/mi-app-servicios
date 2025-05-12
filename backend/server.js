@@ -1,16 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config(); //  cargar variables de entorno
+require('dotenv').config(); // cargar variables de entorno
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+//  Middleware
 app.use(cors());
 app.use(express.json());
 
-// Conexión a MongoDB Atlas
+//  Conexión a MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -24,6 +24,10 @@ app.use('/api/auth', authRoutes);
 
 const solicitudRoutes = require('./routes/solicitudes');
 app.use('/api/solicitudes', solicitudRoutes);
+
+// NUEVA RUTA: Cotizaciones
+const cotizacionRoutes = require('./routes/cotizaciones');
+app.use('/api/cotizaciones', cotizacionRoutes);
 
 // Servidor en marcha
 app.listen(PORT, () => {

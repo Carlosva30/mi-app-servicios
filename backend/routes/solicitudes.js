@@ -1,34 +1,48 @@
 const express = require('express');
 const router = express.Router();
-const Solicitud = require('../models/Solicitud');
-const verificarToken = require('../middleware/authMiddleware');
+const mongoose = require('mongoose');
 
-// Guardar solicitud vinculada al usuario autenticado
-router.post('/', verificarToken, async (req, res) => {
+// Definimos el esquema de cotización directamente aquí
+const solicitudSchema = new mongoose.Schema({
+  expertoId: { type: String, required: true },
+  servicio: { type: String, required: true },
+  descripcion: { type: String, required: true },
+  valorPropuesto: { type: Number, required: true },
+  fecha: { type: Date, default: Date.now }
+});
+
+
+const Solicitud = mongoose.model('Solicitud', solicitudSchema);
+
+// Ruta POST para crear una cotización
+router.post('/', async (req, res) => {
   try {
+    const { expertoId, servicio, descripcion, valorPropuesto } = req.body;
+
     const nuevaSolicitud = new Solicitud({
-      email: req.body.email,
-      servicio: req.body.servicio,
-      descripcion: req.body.descripcion,
-      usuario: req.usuario.id // viene del token
+      expertoId,
+      servicio,
+      descripcion,
+      valorPropuesto
     });
 
     await nuevaSolicitud.save();
-    res.status(201).json({ mensaje: 'Solicitud guardada exitosamente' });
+
+    res.status(201).json({ mensaje: '✅ Cotización guardada exitosamente' });
   } catch (error) {
-    console.error('❌ Error al guardar solicitud:', error.message);
-    res.status(500).json({ error: 'Error al guardar la solicitud' });
+    console.error('❌ Error al guardar la solicitud:', error);
+    res.status(500).json({ mensaje: 'Error al guardar la solicitud' });
   }
 });
 
-// Obtener solo las solicitudes del usuario autenticado
-router.get('/', verificarToken, async (req, res) => {
+// Ruta GET para ver todas las cotizaciones guardadas
+router.get('/', async (req, res) => {
   try {
-    const solicitudes = await Solicitud.find({ usuario: req.usuario.id });
+    const solicitudes = await Solicitud.find().sort({ fecha: -1 });
     res.json({ solicitudes });
   } catch (error) {
-    console.error('❌ Error al obtener solicitudes:', error.message);
-    res.status(500).json({ error: 'Error al obtener las solicitudes' });
+    console.error('❌ Error al obtener solicitudes:', error);
+    res.status(500).json({ mensaje: 'Error al obtener solicitudes' });
   }
 });
 

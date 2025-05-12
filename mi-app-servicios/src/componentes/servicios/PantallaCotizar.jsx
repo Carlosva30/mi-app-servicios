@@ -1,23 +1,30 @@
 import React, { useState } from 'react';
+import axios from '../../api/axios';
 
 function PantallaCotizar({ experto, onEnviarCotizacion, onVolver }) {
   const [descripcion, setDescripcion] = useState('');
   const [valor, setValor] = useState('');
+  const [mensaje, setMensaje] = useState('');
 
-  const manejarEnvio = (e) => {
+  const manejarEnvio = async (e) => {
     e.preventDefault();
 
     const cotizacion = {
-      expertoId: experto._id || experto.id, // por si viene desde Mongo o simulado
+      expertoId: experto._id || experto.id,
+      servicio: experto.servicio,
       descripcion,
       valorPropuesto: parseInt(valor, 10)
     };
 
-    // Simulación por ahora
-    console.log('Cotización lista para enviar al backend:', cotizacion);
-
-    if (onEnviarCotizacion) {
-      onEnviarCotizacion(cotizacion);
+    try {
+      await axios.post('/solicitudes', cotizacion); // Envío real al backend
+      setMensaje('✅ Cotización enviada correctamente');
+      if (onEnviarCotizacion) {
+        onEnviarCotizacion(cotizacion); // puede cambiar pantalla
+      }
+    } catch (error) {
+      console.error('❌ Error al enviar cotización:', error);
+      setMensaje('❌ Error al enviar la cotización');
     }
   };
 
@@ -51,6 +58,12 @@ function PantallaCotizar({ experto, onEnviarCotizacion, onVolver }) {
         <button type="button" onClick={onVolver} style={{ padding: '10px 20px' }}>
           Volver
         </button>
+
+        {mensaje && (
+          <p style={{ marginTop: '15px', fontWeight: 'bold', color: mensaje.startsWith('✅') ? 'green' : 'red' }}>
+            {mensaje}
+          </p>
+        )}
       </form>
     </div>
   );

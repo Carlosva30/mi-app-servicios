@@ -39,12 +39,19 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
   const [textoBusqueda, setTextoBusqueda] = useState('');
   const [resultados, setResultados] = useState([]);
 
-  // ✅ Recuperar datos del usuario y su tipo desde localStorage
-  const usuario = JSON.parse(localStorage.getItem('usuario'));
-  const tipoUsuario = localStorage.getItem('tipoUsuario');
+  // ✅ Manejo seguro de usuario
+  let usuario = null;
+  try {
+    const raw = localStorage.getItem('usuario');
+    if (raw) usuario = JSON.parse(raw);
+  } catch (e) {
+    console.error('❌ Error al leer usuario del localStorage:', e);
+  }
+
+  const tipoUsuario = localStorage.getItem('tipoUsuario') || '';
 
   const cerrarSesion = () => {
-    localStorage.clear(); // Limpia token, tipoUsuario, usuario
+    localStorage.clear();
     onLogout();
   };
 
@@ -59,20 +66,17 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
   return (
     <div style={{ padding: '20px', textAlign: 'center', color: 'white', backgroundColor: '#1e318a', minHeight: '100vh' }}>
       
-      {/* Menú y Dirección */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div style={{ fontSize: '24px' }}>☰</div>
         <div style={{ fontSize: '16px' }}>📍 Dirección</div>
       </div>
 
-      {/* ✅ Mostrar información del usuario */}
       {usuario && (
         <div style={{ marginBottom: '20px', fontSize: '16px' }}>
           <p><strong>Hola, {usuario.nombre}</strong> ({tipoUsuario})</p>
         </div>
       )}
 
-      {/* Barra de búsqueda */}
       <div style={{ marginBottom: '20px' }}>
         <input
           type="text"
@@ -86,7 +90,6 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
         </button>
       </div>
 
-      {/* Resultados de búsqueda */}
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '15px' }}>
         {resultados.map((experto) => (
           <div
@@ -118,7 +121,6 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
         ))}
       </div>
 
-      {/* Opciones adicionales */}
       <div style={{ marginTop: '30px' }}>
         <button onClick={onVerSolicitudes} style={{ marginRight: '10px', padding: '10px 20px' }}>
           Ver solicitudes guardadas
