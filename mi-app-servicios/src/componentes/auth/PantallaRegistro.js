@@ -25,9 +25,8 @@ const PantallaRegistro = ({ onRegistro }) => {
       setMensaje('¡Usuario registrado exitosamente! ✅');
 
       setTimeout(() => {
-        if (onRegistro) onRegistro(tipoUsuario); // ✅ le paso el tipo de usuario
+        if (onRegistro) onRegistro(tipoUsuario);
       }, 2000);
-
     } catch (error) {
       setExito(false);
       setMensaje(error.response?.data?.mensaje || 'Error al registrarse');
@@ -36,16 +35,35 @@ const PantallaRegistro = ({ onRegistro }) => {
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '30px' }}>
-      <h2>Registro</h2>
-      <form onSubmit={handleSubmit}>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      backgroundColor: '#1e318a'
+    }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          backgroundColor: '#1e318af',
+          padding: '30px',
+          borderRadius: '12px',
+          boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '300px'
+        }}
+      >
+        <h2 style={{ marginBottom: '20px' }}>Registro</h2>
+
         <input
           type="text"
           placeholder="Tu nombre"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           required
-          style={{ display: 'block', marginBottom: '10px', width: '250px', padding: '10px' }}
+          style={{ marginBottom: '10px', width: '100%', padding: '10px' }}
         />
 
         <input
@@ -54,7 +72,7 @@ const PantallaRegistro = ({ onRegistro }) => {
           value={correo}
           onChange={(e) => setCorreo(e.target.value)}
           required
-          style={{ display: 'block', marginBottom: '10px', width: '250px', padding: '10px' }}
+          style={{ marginBottom: '10px', width: '100%', padding: '10px' }}
         />
 
         <input
@@ -63,23 +81,23 @@ const PantallaRegistro = ({ onRegistro }) => {
           value={contraseña}
           onChange={(e) => setContraseña(e.target.value)}
           required
-          style={{ display: 'block', marginBottom: '20px', width: '250px', padding: '10px' }}
+          style={{ marginBottom: '10px', width: '100%', padding: '10px' }}
         />
 
-        {/* Nuevo campo de selección */}
         <select
           value={tipoUsuario}
           onChange={(e) => setTipoUsuario(e.target.value)}
           required
-          style={{ width: '260px', padding: '10px', marginBottom: '20px' }}
+          style={{ marginBottom: '20px', width: '100%', padding: '10px' }}
         >
           <option value="">Selecciona tu tipo de usuario</option>
           <option value="cliente">Cliente</option>
           <option value="experto">Experto</option>
         </select>
 
-        <br />
-        <button type="submit" style={{ padding: '10px 20px' }}>Registrarse</button>
+        <button type="submit" style={{ padding: '10px 20px', width: '100%' }}>
+          Registrarse
+        </button>
 
         {mensaje && (
           <p style={{

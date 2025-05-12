@@ -39,8 +39,12 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
   const [textoBusqueda, setTextoBusqueda] = useState('');
   const [resultados, setResultados] = useState([]);
 
+  // ✅ Recuperar datos del usuario y su tipo desde localStorage
+  const usuario = JSON.parse(localStorage.getItem('usuario'));
+  const tipoUsuario = localStorage.getItem('tipoUsuario');
+
   const cerrarSesion = () => {
-    localStorage.removeItem('token');
+    localStorage.clear(); // Limpia token, tipoUsuario, usuario
     onLogout();
   };
 
@@ -53,13 +57,20 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
   };
 
   return (
-    <div style={{ padding: '20px', textAlign: 'center' }}>
+    <div style={{ padding: '20px', textAlign: 'center', color: 'white', backgroundColor: '#1e318a', minHeight: '100vh' }}>
       
-      {/* Menú y Ubicación */}
+      {/* Menú y Dirección */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div style={{ fontSize: '24px' }}>☰</div>
         <div style={{ fontSize: '16px' }}>📍 Dirección</div>
       </div>
+
+      {/* ✅ Mostrar información del usuario */}
+      {usuario && (
+        <div style={{ marginBottom: '20px', fontSize: '16px' }}>
+          <p><strong>Hola, {usuario.nombre}</strong> ({tipoUsuario})</p>
+        </div>
+      )}
 
       {/* Barra de búsqueda */}
       <div style={{ marginBottom: '20px' }}>
@@ -78,7 +89,18 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
       {/* Resultados de búsqueda */}
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '15px' }}>
         {resultados.map((experto) => (
-          <div key={experto.id} style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '10px', width: '180px', textAlign: 'center' }}>
+          <div
+            key={experto.id}
+            style={{
+              border: '1px solid #ccc',
+              padding: '10px',
+              borderRadius: '10px',
+              width: '180px',
+              textAlign: 'center',
+              backgroundColor: 'white',
+              color: 'black'
+            }}
+          >
             <img src={experto.foto} alt={experto.nombre} style={{ width: '80px', height: '80px', borderRadius: '50%' }} />
             <h4>{experto.nombre}</h4>
             <p>{experto.servicio}</p>
@@ -86,7 +108,7 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
             <p style={{ color: experto.disponibilidad === 'Disponible' ? 'green' : 'red' }}>
               {experto.disponibilidad}
             </p>
-            <button 
+            <button
               onClick={() => onCotizar(experto)}
               style={{ marginTop: '10px', padding: '5px 10px' }}
             >
@@ -101,12 +123,10 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
         <button onClick={onVerSolicitudes} style={{ marginRight: '10px', padding: '10px 20px' }}>
           Ver solicitudes guardadas
         </button>
-
         <button onClick={cerrarSesion} style={{ padding: '10px 20px' }}>
           Cerrar sesión
         </button>
       </div>
-
     </div>
   );
 }

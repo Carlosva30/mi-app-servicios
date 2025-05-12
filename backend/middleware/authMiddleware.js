@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'mi_clave_secreta'; // En el futuro lo moveremos a .env
+require('dotenv').config(); //  para leer el archivo .env
+const JWT_SECRET = process.env.JWT_SECRET; // clave segura desde .env
 
 function verificarToken(req, res, next) {
   const token = req.header('Authorization');

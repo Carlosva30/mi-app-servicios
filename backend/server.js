@@ -1,17 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config(); //  cargar variables de entorno
 
-// Crear app de Express
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
-app.use(express.json()); // Para leer JSON del cuerpo de las peticiones
+app.use(express.json());
 
 // Conexión a MongoDB Atlas
-mongoose.connect('mongodb+srv://appServicios:Sarasara2.@cluster0.nhorckw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })

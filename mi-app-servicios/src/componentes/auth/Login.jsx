@@ -10,58 +10,82 @@ function Login({ onLoginExitoso, onRegistro }) {
     e.preventDefault();
     try {
       const respuesta = await axios.post('/auth/login', { correo, contraseña });
+
+      // ✅ Guardar toda la información necesaria
       localStorage.setItem('token', respuesta.data.token);
-      if (onLoginExitoso) onLoginExitoso();
+      localStorage.setItem('tipoUsuario', respuesta.data.tipoUsuario);
+      localStorage.setItem('usuario', JSON.stringify(respuesta.data.usuario));
+
+      if (onLoginExitoso) onLoginExitoso(respuesta.data.tipoUsuario);
+
     } catch (error) {
       setMensaje(error.response?.data?.mensaje || 'Error al iniciar sesión');
     }
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '40px' }}>
-      {/* Logo */}
-      <div style={{ marginBottom: '20px' }}>
-        <img src="https://via.placeholder.com/150" alt="Logo" style={{ width: '100px' }} />
-      </div>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      backgroundColor: '#1e318a'
+    }}>
+      <form
+        onSubmit={manejarLogin}
+        style={{
+          backgroundColor: '#1e318a',
+          padding: '30px',
+          borderRadius: '12px',
+          boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '300px'
+        }}
+      >
+        <img
+          src="https://via.placeholder.com/100"
+          alt="Logo"
+          style={{ marginBottom: '20px' }}
+        />
 
-      <h2>Iniciar sesión</h2>
+        <h2 style={{ marginBottom: '20px' }}>Iniciar sesión</h2>
 
-      <form onSubmit={manejarLogin}>
-        {/* Email o nombre */}
         <input
           type="email"
-          placeholder="Email o Nombre"
+          placeholder="Correo electrónico"
           value={correo}
           onChange={(e) => setCorreo(e.target.value)}
           required
-          style={{ width: '250px', padding: '10px', marginBottom: '10px' }}
+          style={{ marginBottom: '10px', width: '100%', padding: '10px' }}
         />
-        <br />
 
-        {/* Contraseña */}
         <input
           type="password"
           placeholder="Contraseña"
           value={contraseña}
           onChange={(e) => setContraseña(e.target.value)}
           required
-          style={{ width: '250px', padding: '10px', marginBottom: '10px' }}
+          style={{ marginBottom: '10px', width: '100%', padding: '10px' }}
         />
-        <br />
 
-        {/* Link olvidar contraseña (solo visual por ahora) */}
         <div style={{ marginBottom: '20px' }}>
-          <a href="#" style={{ fontSize: '14px', color: '#ccc' }}>
+          <a href="#" style={{ fontSize: '14px', color: '#888' }}>
             ¿Olvidaste tu contraseña?
           </a>
         </div>
 
-        {/* Botones */}
-        <button type="submit" style={{ marginRight: '10px', padding: '10px 20px' }}>Entrar</button>
-        <button type="button" onClick={onRegistro} style={{ padding: '10px 20px' }}>Registrarse</button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button type="submit" style={{ padding: '10px 20px' }}>Entrar</button>
+          <button type="button" onClick={onRegistro} style={{ padding: '10px 20px' }}>Registrarse</button>
+        </div>
 
-        {/* Mensaje de error */}
-        {mensaje && <p style={{ color: 'red', marginTop: '15px' }}>{mensaje}</p>}
+        {mensaje && (
+          <p style={{ color: 'red', marginTop: '15px', fontWeight: 'bold' }}>
+            {mensaje}
+          </p>
+        )}
       </form>
     </div>
   );

@@ -1,11 +1,11 @@
-const verificarToken = require('../middleware/authMiddleware');
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Usuario = require('../models/Usuario');
+require('dotenv').config(); // Cargar variables de entorno
 
 const router = express.Router();
-const JWT_SECRET = 'mi_clave_secreta'; // más adelante lo pondremos en .env
+const JWT_SECRET = process.env.JWT_SECRET; // Usar la clave secreta del .env
 
 // Registro de usuario
 router.post('/registro', async (req, res) => {
@@ -21,7 +21,7 @@ router.post('/registro', async (req, res) => {
     // Encriptar la contraseña
     const contraseñaSegura = await bcrypt.hash(contraseña, 10);
 
-    // Crear y guardar el nuevo usuario con tipo
+    // Crear y guardar el nuevo usuario
     const nuevoUsuario = new Usuario({
       nombre,
       correo,
@@ -30,7 +30,6 @@ router.post('/registro', async (req, res) => {
     });
 
     await nuevoUsuario.save();
-
     res.status(201).json({ mensaje: 'Usuario registrado con éxito' });
 
   } catch (error) {
@@ -39,5 +38,40 @@ router.post('/registro', async (req, res) => {
   }
 });
 
-// Exportar el router
+// Login de usuario
+router.post('/login', async (req, res) => {
+  const { correo, contraseña } = req.body;
+
+  try {
+    const usuario = await Usuario.findOne({ correo });
+    if (!usuario) {
+      return res.status(400).json({ mensaje: 'Correo o contraseña incorrectos.' });
+    }
+
+    const contraseñaValida = await bcrypt.compare(contraseña, usuario.contraseña);
+    if (!contraseñaValida) {
+      return res.status(400).json({ mensaje: 'Correo o contraseña incorrectos.' });
+    }
+
+    // Generar el token
+    const token = jwt.sign(
+      { id: usuario._id, tipoUsuario: usuario.tipoUsuario },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.status(200).json({
+      mensaje: 'Login exitoso',
+      token,
+      tipoUsuario: usuario.tipoUsuario,
+      nombre: usuario.nombre,
+      correo: usuario.correo
+    });
+
+  } catch (error) {
+    console.error('❌ Error al iniciar sesión:', error.message);
+    res.status(500).json({ mensaje: 'Error al iniciar sesión' });
+  }
+});
+
 module.exports = router;
