@@ -16,21 +16,17 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// ✅ Middleware para parsear JSON
+// Middleware para parsear JSON
 app.use(express.json());
 
-// ✅ Mostrar la URI para verificar si se está leyendo correctamente
+//  Conexión a MongoDB Atlas (simplificada)
 console.log("🧪 URI de conexión MongoDB:", process.env.MONGODB_URI);
 
-// ✅ Conexión a MongoDB Atlas
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('✅ Conectado a MongoDB Atlas'))
-.catch(err => console.error('❌ Error conectando a MongoDB:', err));
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('✅ Conectado a MongoDB Atlas'))
+  .catch(err => console.error('❌ Error conectando a MongoDB:', err));
 
-// ✅ Rutas del backend
+// Rutas del backend
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
@@ -40,12 +36,12 @@ app.use('/api/solicitudes', solicitudRoutes);
 const cotizacionRoutes = require('./routes/cotizaciones');
 app.use('/api/cotizaciones', cotizacionRoutes);
 
-// ✅ Ruta base (opcional)
+// Ruta base (opcional)
 app.get('/', (req, res) => {
   res.send('🚀 API Now Services corriendo en Render correctamente');
 });
 
-// ✅ Iniciar el servidor
+// Iniciar el servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
