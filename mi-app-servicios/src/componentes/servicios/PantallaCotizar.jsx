@@ -17,13 +17,15 @@ function PantallaCotizar({ experto, onEnviarCotizacion, onVolver }) {
     };
 
     try {
-      await axios.post('/solicitudes', cotizacion); // Envío real al backend
+      await axios.post('/cotizaciones', cotizacion); // se envía al backend con token automáticamente
       setMensaje('✅ Cotización enviada correctamente');
+
       if (onEnviarCotizacion) {
-        onEnviarCotizacion(cotizacion); // puede cambiar pantalla
+        onEnviarCotizacion(cotizacion); // cambia de pantalla
       }
+
     } catch (error) {
-      console.error('❌ Error al enviar cotización:', error);
+      console.error('❌ Error al enviar la cotización:', error);
       setMensaje('❌ Error al enviar la cotización');
     }
   };
@@ -32,6 +34,7 @@ function PantallaCotizar({ experto, onEnviarCotizacion, onVolver }) {
     <div style={{ padding: '20px', textAlign: 'center' }}>
       <h2>Cotizar Servicio</h2>
       <p>👷‍♂️ Experto: <strong>{experto.nombre}</strong></p>
+      <p>🛠 Servicio: {experto.servicio}</p>
 
       <form onSubmit={manejarEnvio}>
         <textarea

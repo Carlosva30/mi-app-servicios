@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Cotizacion = require('../models/Cotizacion');
-const verificarToken = require('../authMiddleware');
+const verificarToken = require('../middleware/authMiddleware');
+
 
 // Crear una cotización
 router.post('/', verificarToken, async (req, res) => {
