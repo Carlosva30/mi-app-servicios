@@ -5,35 +5,41 @@ const EXPERTOS = [
     id: 1,
     nombre: 'Pedro Plomero',
     servicio: 'Plomería',
-    foto: 'https://via.placeholder.com/80',
-    calificacion: 4.5,
+    foto: 'https://via.placeholder.com/150x150',
+    precio: 40000,
     disponibilidad: 'Disponible'
   },
   {
     id: 2,
     nombre: 'Laura Electricista',
     servicio: 'Eléctrico',
-    foto: 'https://via.placeholder.com/80',
-    calificacion: 4.8,
+    foto: 'https://via.placeholder.com/150x150',
+    precio: 55000,
     disponibilidad: 'Disponible'
   },
   {
     id: 3,
     nombre: 'Juan Pintor',
     servicio: 'Pintor',
-    foto: 'https://via.placeholder.com/80',
-    calificacion: 4.2,
+    foto: 'https://via.placeholder.com/150x150',
+    precio: 30000,
     disponibilidad: 'Ocupado'
   },
   {
     id: 4,
     nombre: 'Ana TodoServicio',
     servicio: 'Otros',
-    foto: 'https://via.placeholder.com/80',
-    calificacion: 4.7,
+    foto: 'https://via.placeholder.com/150x150',
+    precio: 25000,
     disponibilidad: 'Disponible'
   }
 ];
+
+const formatoPesos = new Intl.NumberFormat('es-CO', {
+  style: 'currency',
+  currency: 'COP',
+  minimumFractionDigits: 0
+});
 
 function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onCotizar }) {
   const [textoBusqueda, setTextoBusqueda] = useState('');
@@ -64,67 +70,61 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
   };
 
   return (
-    <div style={{ padding: '20px', textAlign: 'center', color: 'white', backgroundColor: '#1e318a', minHeight: '100vh' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <div style={{ fontSize: '24px' }}>☰</div>
-        <div style={{ fontSize: '16px' }}>📍 Dirección</div>
-      </div>
-
-      {usuario && (
-        <div style={{ marginBottom: '20px', fontSize: '16px' }}>
-          <p><strong>Hola, {usuario.nombre}</strong> ({tipoUsuario})</p>
-        </div>
-      )}
-
-      <div style={{ marginBottom: '20px' }}>
+    <div style={{ backgroundColor: '#f5f5f5', minHeight: '100vh', padding: '10px' }}>
+      <div style={{ backgroundColor: 'white', padding: '10px', borderRadius: '8px', marginBottom: '10px' }}>
         <input
           type="text"
           placeholder="Buscar servicio (Ej: Plomería o Juan)"
           value={textoBusqueda}
           onChange={(e) => setTextoBusqueda(e.target.value)}
-          style={{ width: '70%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+          style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
         />
-        <button onClick={manejarBusqueda} style={{ padding: '10px 20px', marginLeft: '10px' }}>
+        <button onClick={manejarBusqueda} style={{ marginTop: '10px', padding: '10px 20px', backgroundColor: '#1e318a', color: 'white', border: 'none', borderRadius: '5px' }}>
           Buscar
         </button>
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '15px' }}>
+      {usuario && (
+        <div style={{ marginBottom: '10px', textAlign: 'center' }}>
+          <strong>Hola, {usuario.nombre}</strong> ({tipoUsuario})
+        </div>
+      )}
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', justifyContent: 'center' }}>
         {resultados.map((experto) => (
           <div
             key={experto.id}
             style={{
-              border: '1px solid #ccc',
-              padding: '10px',
-              borderRadius: '10px',
-              width: '180px',
-              textAlign: 'center',
               backgroundColor: 'white',
-              color: 'black'
+              borderRadius: '10px',
+              width: '160px',
+              padding: '10px',
+              textAlign: 'center',
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)'
             }}
           >
-            <img src={experto.foto} alt={experto.nombre} style={{ width: '80px', height: '80px', borderRadius: '50%' }} />
-            <h4>{experto.nombre}</h4>
-            <p>{experto.servicio}</p>
-            <p>⭐ {experto.calificacion}</p>
-            <p style={{ color: experto.disponibilidad === 'Disponible' ? 'green' : 'red' }}>
+            <img src={experto.foto} alt={experto.nombre} style={{ width: '100%', borderRadius: '8px' }} />
+            <h4 style={{ fontSize: '16px', margin: '10px 0 5px 0' }}>{experto.nombre}</h4>
+            <p style={{ margin: 0 }}>{experto.servicio}</p>
+            <p style={{ color: '#e60023', fontWeight: 'bold' }}>{formatoPesos.format(experto.precio)}</p>
+            <p style={{ color: experto.disponibilidad === 'Disponible' ? 'green' : 'red', fontSize: '13px' }}>
               {experto.disponibilidad}
             </p>
             <button
               onClick={() => onCotizar(experto)}
-              style={{ marginTop: '10px', padding: '5px 10px' }}
+              style={{ padding: '6px 10px', backgroundColor: '#1e318a', color: 'white', border: 'none', borderRadius: '5px' }}
             >
-              Cotizar
+              Solicitar
             </button>
           </div>
         ))}
       </div>
 
-      <div style={{ marginTop: '30px' }}>
-        <button onClick={onVerSolicitudes} style={{ marginRight: '10px', padding: '10px 20px' }}>
+      <div style={{ marginTop: '30px', textAlign: 'center' }}>
+        <button onClick={onVerSolicitudes} style={{ marginRight: '10px', padding: '10px 20px', backgroundColor: '#1e318a', color: 'white', border: 'none', borderRadius: '5px' }}>
           Ver solicitudes guardadas
         </button>
-        <button onClick={cerrarSesion} style={{ padding: '10px 20px' }}>
+        <button onClick={cerrarSesion} style={{ padding: '10px 20px', backgroundColor: '#d32f2f', color: 'white', border: 'none', borderRadius: '5px' }}>
           Cerrar sesión
         </button>
       </div>
@@ -133,4 +133,3 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
 }
 
 export default PantallaInicio;
-
