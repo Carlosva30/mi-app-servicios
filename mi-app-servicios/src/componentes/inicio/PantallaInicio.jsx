@@ -39,7 +39,6 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
   const [textoBusqueda, setTextoBusqueda] = useState('');
   const [resultados, setResultados] = useState([]);
 
-  // ✅ Manejo seguro de usuario
   let usuario = null;
   try {
     const raw = localStorage.getItem('usuario');
@@ -55,7 +54,6 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
     onLogout();
   };
 
-  // ✅ Buscador mejorado: filtra por nombre y servicio
   const manejarBusqueda = () => {
     const texto = textoBusqueda.toLowerCase();
     const filtrados = EXPERTOS.filter(experto =>
@@ -67,7 +65,6 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
 
   return (
     <div style={{ padding: '20px', textAlign: 'center', color: 'white', backgroundColor: '#1e318a', minHeight: '100vh' }}>
-      
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div style={{ fontSize: '24px' }}>☰</div>
         <div style={{ fontSize: '16px' }}>📍 Dirección</div>
