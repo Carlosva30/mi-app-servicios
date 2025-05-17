@@ -1,76 +1,88 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const Usuario = require('../models/Usuario');
-require('dotenv').config(); // Cargar variables de entorno
-
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET; // Usar la clave secreta del .env
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+require('dotenv').config();
+const Usuario = require('../models/Usuario');
+const verificarToken = require('../middleware/authMiddleware');
 
-// Registro de usuario
+// Registro
 router.post('/registro', async (req, res) => {
-  const { nombre, correo, contraseña, tipoUsuario } = req.body;
-
   try {
-    // Verificar si el correo ya existe
-    const existe = await Usuario.findOne({ correo });
-    if (existe) {
-      return res.status(400).json({ mensaje: 'Ese correo ya está registrado.' });
+    const { nombre, correo, contraseña, tipoUsuario } = req.body;
+
+    const usuarioExistente = await Usuario.findOne({ correo });
+    if (usuarioExistente) {
+      return res.status(400).json({ mensaje: 'El correo ya está registrado' });
     }
 
-    // Encriptar la contraseña
-    const contraseñaSegura = await bcrypt.hash(contraseña, 10);
+    const hashedPassword = await bcrypt.hash(contraseña, 10);
 
-    // Crear y guardar el nuevo usuario
     const nuevoUsuario = new Usuario({
       nombre,
       correo,
-      contraseña: contraseñaSegura,
+      contraseña: hashedPassword,
       tipoUsuario
     });
 
     await nuevoUsuario.save();
-    res.status(201).json({ mensaje: 'Usuario registrado con éxito' });
 
+    res.status(201).json({ mensaje: 'Usuario registrado exitosamente' });
   } catch (error) {
-    console.error('❌ Error al registrar:', error.message);
-    res.status(500).json({ mensaje: 'Error al registrar' });
+    console.error('Error en el registro:', error);
+    res.status(500).json({ mensaje: 'Error al registrar el usuario' });
   }
 });
 
-// Login de usuario
+// Login
 router.post('/login', async (req, res) => {
-  const { correo, contraseña } = req.body;
-
   try {
+    const { correo, contraseña } = req.body;
+
     const usuario = await Usuario.findOne({ correo });
     if (!usuario) {
-      return res.status(400).json({ mensaje: 'Correo o contraseña incorrectos.' });
+      return res.status(400).json({ mensaje: 'Correo no registrado' });
     }
 
     const contraseñaValida = await bcrypt.compare(contraseña, usuario.contraseña);
     if (!contraseñaValida) {
-      return res.status(400).json({ mensaje: 'Correo o contraseña incorrectos.' });
+      return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
     }
 
-    // Generar el token
-    const token = jwt.sign(
-      { id: usuario._id, tipoUsuario: usuario.tipoUsuario },
-      JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+    const token = jwt.sign({
+      id: usuario._id,
+      correo: usuario.correo,
+      tipoUsuario: usuario.tipoUsuario
+    }, process.env.JWT_SECRET, { expiresIn: '3h' });
 
     res.status(200).json({
       mensaje: 'Login exitoso',
       token,
       tipoUsuario: usuario.tipoUsuario,
-      nombre: usuario.nombre,
-      correo: usuario.correo
+      usuario: {
+        nombre: usuario.nombre,
+        correo: usuario.correo,
+        tipoUsuario: usuario.tipoUsuario
+      }
     });
-
   } catch (error) {
-    console.error('❌ Error al iniciar sesión:', error.message);
+    console.error('Error en el login:', error);
     res.status(500).json({ mensaje: 'Error al iniciar sesión' });
+  }
+});
+
+// Ruta protegida para obtener perfil
+router.get('/perfil', verificarToken, async (req, res) => {
+  try {
+    const usuario = await Usuario.findById(req.usuario.id).select('-contraseña');
+    if (!usuario) {
+      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    }
+
+    res.status(200).json({ usuario });
+  } catch (error) {
+    console.error('Error al obtener perfil:', error);
+    res.status(500).json({ mensaje: 'Error al obtener perfil' });
   }
 });
 
