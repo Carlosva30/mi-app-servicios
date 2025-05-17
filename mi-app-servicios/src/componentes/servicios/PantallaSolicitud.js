@@ -1,24 +1,39 @@
 import React, { useState } from 'react';
+import axios from '../../api/axios'; // con token incluido
 
-const PantallaSolicitud = ({ onConfirmar, setDescripcion }) => {
+const PantallaSolicitud = ({ onConfirmar }) => {
   const [texto, setTexto] = useState('');
+  const [mensaje, setMensaje] = useState('');
 
-  const handleConfirmar = () => {
-    setDescripcion(texto); // esto actualiza el estado en App.js
-    console.log("Descripción del problema:", texto);
-    onConfirmar(); // pasa a la siguiente pantalla
+  const handleConfirmar = async () => {
+    try {
+      const respuesta = await axios.post('/solicitudes', {
+        servicio: 'General',           
+        descripcion: texto
+      });
+
+      setMensaje('✅ Solicitud enviada correctamente');
+      onConfirmar(); // cambiar pantalla
+
+    } catch (error) {
+      console.error('❌ Error al enviar solicitud:', error);
+      setMensaje('❌ Hubo un error al guardar tu solicitud');
+    }
   };
 
   return (
-    <div>
+    <div style={{ padding: '20px' }}>
       <h2>Solicitud de Servicio</h2>
       <textarea
         placeholder="Describe tu problema..."
         value={texto}
         onChange={(e) => setTexto(e.target.value)}
         required
-      ></textarea>
+        style={{ width: '100%', height: '100px', padding: '10px' }}
+      />
+      <br />
       <button onClick={handleConfirmar}>Confirmar</button>
+      {mensaje && <p style={{ color: mensaje.startsWith('✅') ? 'green' : 'red' }}>{mensaje}</p>}
     </div>
   );
 };
