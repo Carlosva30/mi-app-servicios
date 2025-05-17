@@ -18,7 +18,7 @@ import PantallaPago from './componentes/pagos/PantallaPago';
 import './App.css';
 
 function App() {
-  const [pantalla, setPantalla] = useState('login'); // ← ahora inicia en Login
+  const [pantalla, setPantalla] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [servicio, setServicio] = useState('');
@@ -36,7 +36,14 @@ function App() {
       {pantalla === 'login' && (
         <Login
           onRegistro={() => setPantalla('registro')}
-          onLoginExitoso={() => setPantalla('inicio')}
+          onLoginExitoso={() => {
+            const tipoUsuario = localStorage.getItem('tipoUsuario');
+            if (tipoUsuario === 'experto') {
+              setPantalla('perfilExperto');
+            } else {
+              setPantalla('inicio');
+            }
+          }}
         />
       )}
 
@@ -44,46 +51,48 @@ function App() {
       {pantalla === 'inicio' && (
         <PantallaInicio
           onCotizar={(experto) => {
-           setExpertoSeleccionado(experto);
-           setPantalla('cotizar');
-        }}
+            setExpertoSeleccionado(experto);
+            setPantalla('cotizar');
+          }}
           onVerSolicitudes={() => setPantalla('verSolicitudes')}
           onLogout={() => setPantalla('login')}
-         />
-      )}
-
-      {pantalla === 'cotizar' && expertoSeleccionado && (
-        <PantallaCotizar
-         experto={expertoSeleccionado}
-         onEnviarCotizacion={(datos) => {
-         console.log('Cotización enviada:', datos);
-          setPantalla('inicio');
-        }}
-         onVolver={() => setPantalla('inicio')}
         />
       )}
 
+      {/* COTIZAR */}
+      {pantalla === 'cotizar' && expertoSeleccionado && (
+        <PantallaCotizar
+          experto={expertoSeleccionado}
+          onEnviarCotizacion={(datos) => {
+            console.log('Cotización enviada:', datos);
+            setPantalla('inicio');
+          }}
+          onVolver={() => setPantalla('inicio')}
+        />
+      )}
 
       {/* REGISTRO */}
       {pantalla === 'registro' && (
-       <PantallaRegistro
-         onRegistro={(tipoUsuario) => {
-           if (tipoUsuario === 'cliente') {
-            setPantalla('inicio');
-         } else if (tipoUsuario === 'experto') {
-          setPantalla('perfilExperto');
-         }
-        }}
+        <PantallaRegistro
+          onRegistro={(tipoUsuario) => {
+            if (tipoUsuario === 'cliente') {
+              setPantalla('inicio');
+            } else if (tipoUsuario === 'experto') {
+              setPantalla('perfilExperto');
+            }
+          }}
         />
       )}
 
-        {/* SELECCION DE PERFIL EXPERTO */}
-        {pantalla === 'perfilExperto' && (
-         <PantallaPerfilExperto />
-         )}
+      {/* PERFIL DE EXPERTO */}
+      {pantalla === 'perfilExperto' && (
+        <PantallaPerfilExperto
+          onVerSolicitudes={() => setPantalla('solicitudesRecibidas')}
+          onLogout={() => setPantalla('login')}
+        />
+      )}
 
       {/* SELECCIÓN DE SERVICIOS */}
-
       {pantalla === 'servicios' && (
         <PantallaServicios
           onSeleccionar={(serv) => {
@@ -122,6 +131,11 @@ function App() {
       {pantalla === 'final' && (
         <PantallaFinal onLogout={() => setPantalla('login')} />
       )}
+
+      {/* SOLICITUD RECIBIDA EXPERTO */}
+      {pantalla === 'solicitudesRecibidas' && ( 
+        <PantallaSolicitudesRecibidas onVolver={() => setPantalla('perfilExperto')} />
+      )} 
     </div>
   );
 }
