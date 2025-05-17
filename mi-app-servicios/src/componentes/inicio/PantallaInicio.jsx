@@ -55,10 +55,12 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
     onLogout();
   };
 
+  // ✅ Buscador mejorado: filtra por nombre y servicio
   const manejarBusqueda = () => {
     const texto = textoBusqueda.toLowerCase();
     const filtrados = EXPERTOS.filter(experto =>
-      experto.servicio.toLowerCase().includes(texto)
+      experto.servicio.toLowerCase().includes(texto) ||
+      experto.nombre.toLowerCase().includes(texto)
     );
     setResultados(filtrados);
   };
@@ -80,7 +82,7 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
       <div style={{ marginBottom: '20px' }}>
         <input
           type="text"
-          placeholder="Buscar servicio (Ej: Plomería)"
+          placeholder="Buscar servicio (Ej: Plomería o Juan)"
           value={textoBusqueda}
           onChange={(e) => setTextoBusqueda(e.target.value)}
           style={{ width: '70%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
@@ -134,3 +136,4 @@ function PantallaInicio({ onSeleccionarServicio, onVerSolicitudes, onLogout, onC
 }
 
 export default PantallaInicio;
+
