@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const Usuario = require('../models/Usuario');
-const verificarToken = require('../authMiddleware');
+const verificarToken = require('../middleware/authMiddleware'); 
+require('dotenv').config();
 
 // Registro
 router.post('/registro', async (req, res) => {
@@ -25,7 +26,11 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { _id: usuario._id, nombre: usuario.nombre, correo: usuario.correo },
+      {
+        id: usuario._id,               //  lo espera el middleware
+        correo: usuario.correo,
+        tipoUsuario: usuario.tipoUsuario
+      },
       process.env.JWT_SECRET,
       { expiresIn: '2h' }
     );
@@ -47,7 +52,7 @@ router.get('/:id', verificarToken, async (req, res) => {
   }
 });
 
-//Actualizar usuario (editar perfil)
+// Actualizar usuario (editar perfil)
 router.put('/:id', verificarToken, async (req, res) => {
   try {
     const actualizado = await Usuario.findByIdAndUpdate(req.params.id, req.body, { new: true });
