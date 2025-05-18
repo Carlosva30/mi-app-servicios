@@ -1,92 +1,61 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-require('dotenv').config();
 const Usuario = require('../models/Usuario');
-const verificarToken = require('../middleware/authMiddleware');
+const verificarToken = require('../authMiddleware');
 
 // Registro
 router.post('/registro', async (req, res) => {
   try {
-    const { nombre, correo, contraseña, tipoUsuario } = req.body;
-
-    const usuarioExistente = await Usuario.findOne({ correo });
-    if (usuarioExistente) {
-      return res.status(400).json({ mensaje: 'El correo ya está registrado' });
-    }
-
-    const hashedPassword = await bcrypt.hash(contraseña, 10);
-
-    const nuevoUsuario = new Usuario({
-      nombre,
-      correo,
-      contraseña: hashedPassword,
-      tipoUsuario
-    });
-
+    const nuevoUsuario = new Usuario(req.body);
     await nuevoUsuario.save();
-
-    res.status(201).json({ mensaje: 'Usuario registrado exitosamente' });
+    res.status(201).json(nuevoUsuario);
   } catch (error) {
-    console.error('Error en el registro:', error);
-    res.status(500).json({ mensaje: 'Error al registrar el usuario' });
+    res.status(400).json({ mensaje: 'Error en el registro', error });
   }
 });
 
 // Login
 router.post('/login', async (req, res) => {
+  const { correo, contraseña } = req.body;
   try {
-    const { correo, contraseña } = req.body;
-
-    const usuario = await Usuario.findOne({ correo });
+    const usuario = await Usuario.findOne({ correo, contraseña });
     if (!usuario) {
-      return res.status(400).json({ mensaje: 'Correo no registrado' });
+      return res.status(401).json({ mensaje: 'Credenciales inválidas' });
     }
 
-    const contraseñaValida = await bcrypt.compare(contraseña, usuario.contraseña);
-    if (!contraseñaValida) {
-      return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
-    }
+    const token = jwt.sign(
+      { _id: usuario._id, nombre: usuario.nombre, correo: usuario.correo },
+      process.env.JWT_SECRET,
+      { expiresIn: '2h' }
+    );
 
-    const token = jwt.sign({
-      id: usuario._id,
-      correo: usuario.correo,
-      tipoUsuario: usuario.tipoUsuario
-    }, process.env.JWT_SECRET, { expiresIn: '3h' });
-
-    res.status(200).json({
-      mensaje: 'Login exitoso',
-      token,
-      tipoUsuario: usuario.tipoUsuario,
-      usuario: {
-        id: usuario._id, 
-        nombre: usuario.nombre,
-        correo: usuario.correo,
-        tipoUsuario: usuario.tipoUsuario
-    }
-});
-
+    res.json({ token, usuario });
   } catch (error) {
-    console.error('Error en el login:', error);
-    res.status(500).json({ mensaje: 'Error al iniciar sesión' });
+    res.status(500).json({ mensaje: 'Error en el login', error });
   }
 });
 
-// Ruta protegida para obtener perfil
-router.get('/perfil', verificarToken, async (req, res) => {
+// Obtener usuario por ID
+router.get('/:id', verificarToken, async (req, res) => {
   try {
-    const usuario = await Usuario.findById(req.usuario.id).select('-contraseña');
-    if (!usuario) {
-      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
-    }
-
-    res.status(200).json({ usuario });
+    const usuario = await Usuario.findById(req.params.id);
+    if (!usuario) return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    res.json(usuario);
   } catch (error) {
-    console.error('Error al obtener perfil:', error);
-    res.status(500).json({ mensaje: 'Error al obtener perfil' });
+    res.status(500).json({ mensaje: 'Error al buscar el usuario', error });
+  }
+});
+
+//Actualizar usuario (editar perfil)
+router.put('/:id', verificarToken, async (req, res) => {
+  try {
+    const actualizado = await Usuario.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!actualizado) return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    res.json(actualizado);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar perfil', error });
   }
 });
 
 module.exports = router;
- 
