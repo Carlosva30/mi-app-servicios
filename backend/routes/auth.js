@@ -60,11 +60,13 @@ router.post('/login', async (req, res) => {
       token,
       tipoUsuario: usuario.tipoUsuario,
       usuario: {
+        id: usuario._id, 
         nombre: usuario.nombre,
         correo: usuario.correo,
         tipoUsuario: usuario.tipoUsuario
-      }
-    });
+    }
+});
+
   } catch (error) {
     console.error('Error en el login:', error);
     res.status(500).json({ mensaje: 'Error al iniciar sesión' });
@@ -87,3 +89,4 @@ router.get('/perfil', verificarToken, async (req, res) => {
 });
 
 module.exports = router;
+ 

@@ -9,8 +9,8 @@ const PORT = process.env.PORT || 5000;
 // ✅ Middleware global de CORS configurado correctamente
 app.use(cors({
   origin: [
-    'http://localhost:3000',                       // Desarrollo local
-    'https://mi-app-frontend.vercel.app'       // ✅ frontend real en Vercel
+    'http://localhost:3000',                         // Desarrollo local
+    'https://mi-app-frontend.vercel.app'             // Dominio principal Vercel
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -35,6 +35,10 @@ app.use('/api/solicitudes', solicitudRoutes);
 
 const cotizacionRoutes = require('./routes/cotizaciones');
 app.use('/api/cotizaciones', cotizacionRoutes);
+
+// RUTA PARA EDITAR PERFIL DEL EXPERTO
+const usuarioRoutes = require('./routes/usuarios');
+app.use('/api/usuarios', usuarioRoutes);
 
 // Ruta base (opcional)
 app.get('/', (req, res) => {
