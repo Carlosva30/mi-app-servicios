@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const Usuario = require('../models/Usuario');
-const verificarToken = require('../middleware/authMiddleware'); 
+const verificarToken = require('../middleware/authMiddleware');
 require('dotenv').config();
 
 // Registro
@@ -27,7 +27,7 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign(
       {
-        id: usuario._id,               //  lo espera el middleware
+        id: usuario._id,
         correo: usuario.correo,
         tipoUsuario: usuario.tipoUsuario
       },
@@ -35,7 +35,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '2h' }
     );
 
-    res.json({ token, usuario });
+    res.json({ token, usuario, tipoUsuario: usuario.tipoUsuario });
   } catch (error) {
     res.status(500).json({ mensaje: 'Error en el login', error });
   }
@@ -52,7 +52,7 @@ router.get('/:id', verificarToken, async (req, res) => {
   }
 });
 
-// Actualizar usuario (editar perfil)
+// Actualizar perfil del usuario
 router.put('/:id', verificarToken, async (req, res) => {
   try {
     const actualizado = await Usuario.findByIdAndUpdate(req.params.id, req.body, { new: true });

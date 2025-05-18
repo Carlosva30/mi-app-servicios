@@ -19,27 +19,8 @@ const usuarioSchema = new mongoose.Schema({
     enum: ['cliente', 'experto'],
     required: true
   },
-  servicio: {              // NUEVO: servicio ofrecido
-    type: String
-  },
-  zona: {                  // NUEVO: zona de cobertura
-    type: String
-  },
-  contacto: {              // NUEVO: número de contacto
-    type: String
-  },
-  estado: {                // NUEVO: disponibilidad
-    type: Boolean,
-    default: true
-  },
-  calificacion: {          // opcional
-    type: Number,
-    default: 0
-  },
-  serviciosRealizados: {   // opcional
-    type: Number,
-    default: 0
-  }
+  zona: String,
+  contacto: String
 });
 
 module.exports = mongoose.model('Usuario', usuarioSchema);
