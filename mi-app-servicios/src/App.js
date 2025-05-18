@@ -12,6 +12,8 @@ import PantallaServicios from './componentes/servicios/PantallaServicios';
 import PantallaSolicitud from './componentes/servicios/PantallaSolicitud';
 import PantallaSolicitudesGuardadas from './componentes/servicios/PantallaSolicitudesGuardadas';
 import PantallaSeguimiento from './componentes/servicios/PantallaSeguimiento';
+import PantallaSolicitudesRecibidas from './componentes/servicios/PantallaSolicitudesRecibidas';
+
 
 import PantallaPago from './componentes/pagos/PantallaPago';
 
