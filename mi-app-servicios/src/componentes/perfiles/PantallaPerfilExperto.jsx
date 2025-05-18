@@ -35,11 +35,25 @@ const PerfilExperto = ({ onVerSolicitudes, onLogout }) => {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const guardarCambios = () => {
-    const actualizado = { ...usuario, ...form };
-    localStorage.setItem('usuario', JSON.stringify(actualizado));
-    setUsuario(actualizado);
-    setEditando(false);
+  const guardarCambios = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`https://backend-nowservices.onrender.com/api/usuarios/${usuario.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(form)
+      });
+
+      const actualizado = await res.json();
+      localStorage.setItem('usuario', JSON.stringify(actualizado));
+      setUsuario(actualizado);
+      setEditando(false);
+    } catch (error) {
+      console.error('Error actualizando perfil:', error);
+    }
   };
 
   return (
@@ -49,7 +63,18 @@ const PerfilExperto = ({ onVerSolicitudes, onLogout }) => {
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
         <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Foto" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
         {editando ? (
-          <input name="nombre" value={form.nombre} onChange={handleChange} style={{ marginTop: '10px', padding: '5px' }} />
+          <input
+            name="nombre"
+            value={form.nombre}
+            onChange={handleChange}
+            style={{
+              padding: '8px',
+              border: '1px solid #ccc',
+              borderRadius: '5px',
+              color: '#1e318a',
+              marginTop: '10px'
+            }}
+          />
         ) : (
           <h3>{usuario.nombre || 'Nombre no disponible'}</h3>
         )}
@@ -58,17 +83,17 @@ const PerfilExperto = ({ onVerSolicitudes, onLogout }) => {
 
       <div style={{ backgroundColor: 'white', borderRadius: '15px', padding: '15px', color: '#1e318a' }}>
         <p><strong>Servicio:</strong> {editando ? (
-          <input name="servicio" value={form.servicio} onChange={handleChange} />
+          <input name="servicio" value={form.servicio} onChange={handleChange} style={estiloInput} />
         ) : form.servicio}</p>
 
         <p><strong>Zona de cobertura:</strong> {editando ? (
-          <input name="zona" value={form.zona} onChange={handleChange} />
+          <input name="zona" value={form.zona} onChange={handleChange} style={estiloInput} />
         ) : form.zona}</p>
 
         <p><strong>Horario disponible:</strong> Lunes a Viernes, 8:00am - 6:00pm</p>
 
         <p><strong>Contacto:</strong> {editando ? (
-          <input name="contacto" value={form.contacto} onChange={handleChange} />
+          <input name="contacto" value={form.contacto} onChange={handleChange} style={estiloInput} />
         ) : form.contacto}</p>
 
         <div style={{ marginTop: '10px' }}>
@@ -83,11 +108,11 @@ const PerfilExperto = ({ onVerSolicitudes, onLogout }) => {
       <div style={{ marginTop: '20px', textAlign: 'center' }}>
         {editando ? (
           <>
-            <button onClick={guardarCambios} style={{ marginRight: '10px' }}>Guardar</button>
-            <button onClick={() => setEditando(false)}>Cancelar</button>
+            <button onClick={guardarCambios} style={botonGuardar}>Guardar</button>
+            <button onClick={() => setEditando(false)} style={botonCancelar}>Cancelar</button>
           </>
         ) : (
-          <button onClick={() => setEditando(true)}>Editar perfil</button>
+          <button onClick={() => setEditando(true)} style={botonEditar}>Editar perfil</button>
         )}
       </div>
 
@@ -117,5 +142,40 @@ const PerfilExperto = ({ onVerSolicitudes, onLogout }) => {
   );
 };
 
+const estiloInput = {
+  padding: '8px',
+  width: '100%',
+  border: '1px solid #ccc',
+  borderRadius: '5px',
+  marginBottom: '10px',
+  color: '#1e318a'
+};
+
+const botonGuardar = {
+  padding: '10px 20px',
+  backgroundColor: '#28a745',
+  color: 'white',
+  border: 'none',
+  borderRadius: '10px',
+  marginRight: '10px'
+};
+
+const botonCancelar = {
+  padding: '10px 20px',
+  backgroundColor: '#6c757d',
+  color: 'white',
+  border: 'none',
+  borderRadius: '10px'
+};
+
+const botonEditar = {
+  padding: '10px 20px',
+  backgroundColor: '#007bff',
+  color: 'white',
+  border: 'none',
+  borderRadius: '10px'
+};
+
 export default PerfilExperto;
+
 
