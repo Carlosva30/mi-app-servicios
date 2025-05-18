@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const PerfilExperto = ({ onVerSolicitudes, onLogout }) => {
+const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
   const [estado, setEstado] = useState(true);
   const [usuario, setUsuario] = useState({});
   const [editando, setEditando] = useState(false);
@@ -38,7 +38,7 @@ const PerfilExperto = ({ onVerSolicitudes, onLogout }) => {
   const guardarCambios = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`https://backend-nowservices.onrender.com/api/usuarios/${usuario.id}`, {
+      const res = await fetch(`https://backend-nowservices.onrender.com/api/auth/${usuario._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -176,6 +176,7 @@ const botonEditar = {
   borderRadius: '10px'
 };
 
-export default PerfilExperto;
+export default PantallaPerfilExperto;
+
 
 

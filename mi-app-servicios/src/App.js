@@ -14,7 +14,6 @@ import PantallaSolicitudesGuardadas from './componentes/servicios/PantallaSolici
 import PantallaSeguimiento from './componentes/servicios/PantallaSeguimiento';
 import PantallaSolicitudesRecibidas from './componentes/servicios/PantallaSolicitudesRecibidas';
 
-
 import PantallaPago from './componentes/pagos/PantallaPago';
 
 import './App.css';
@@ -49,7 +48,7 @@ function App() {
         />
       )}
 
-      {/* PANEL DE BIENVENIDA */}
+      {/* PANTALLA DE INICIO */}
       {pantalla === 'inicio' && (
         <PantallaInicio
           onCotizar={(experto) => {
@@ -86,7 +85,7 @@ function App() {
         />
       )}
 
-      {/* PERFIL DE EXPERTO */}
+      {/* PERFIL DEL EXPERTO */}
       {pantalla === 'perfilExperto' && (
         <PantallaPerfilExperto
           onVerSolicitudes={() => setPantalla('solicitudesRecibidas')}
@@ -134,10 +133,10 @@ function App() {
         <PantallaFinal onLogout={() => setPantalla('login')} />
       )}
 
-      {/* SOLICITUD RECIBIDA EXPERTO */}
-      {pantalla === 'solicitudesRecibidas' && ( 
+      {/* SOLICITUDES RECIBIDAS DEL EXPERTO */}
+      {pantalla === 'solicitudesRecibidas' && (
         <PantallaSolicitudesRecibidas onVolver={() => setPantalla('perfilExperto')} />
-      )} 
+      )}
     </div>
   );
 }
