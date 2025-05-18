@@ -10,8 +10,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: [
     'http://localhost:3000',                       // Desarrollo local
-    'https://nowservices.vercel.app',              // Otro dominio posible
-    'https://mi-app-frontend-e4sa.vercel.app'       // ✅ Tu frontend real en Vercel
+    'https://mi-app-frontend.vercel.app'       // ✅ frontend real en Vercel
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
