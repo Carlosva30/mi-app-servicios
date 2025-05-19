@@ -1,14 +1,26 @@
 const express = require('express');
-const router = express.Router();
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Usuario = require('../models/Usuario');
 const verificarToken = require('../middleware/authMiddleware');
 require('dotenv').config();
 
-// Registro
+const router = express.Router();
+
+// Registro con contraseña encriptada
 router.post('/registro', async (req, res) => {
   try {
-    const nuevoUsuario = new Usuario(req.body);
+    const { nombre, correo, contraseña, tipoUsuario } = req.body;
+
+    const contraseñaHasheada = await bcrypt.hash(contraseña, 10);
+
+    const nuevoUsuario = new Usuario({
+      nombre,
+      correo,
+      contraseña: contraseñaHasheada,
+      tipoUsuario
+    });
+
     await nuevoUsuario.save();
     res.status(201).json(nuevoUsuario);
   } catch (error) {
@@ -16,13 +28,18 @@ router.post('/registro', async (req, res) => {
   }
 });
 
-// Login
+// Login con verificación segura
 router.post('/login', async (req, res) => {
   const { correo, contraseña } = req.body;
   try {
-    const usuario = await Usuario.findOne({ correo, contraseña });
+    const usuario = await Usuario.findOne({ correo });
     if (!usuario) {
-      return res.status(401).json({ mensaje: 'Credenciales inválidas' });
+      return res.status(401).json({ mensaje: 'Correo no encontrado' });
+    }
+
+    const esValida = await bcrypt.compare(contraseña, usuario.contraseña);
+    if (!esValida) {
+      return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
     }
 
     const token = jwt.sign(
@@ -60,6 +77,16 @@ router.put('/:id', verificarToken, async (req, res) => {
     res.json(actualizado);
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al actualizar perfil', error });
+  }
+});
+
+// Obtener todos los expertos
+router.get('/', async (req, res) => {
+  try {
+    const expertos = await Usuario.find({ tipoUsuario: 'experto' });
+    res.json(expertos);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener expertos', error });
   }
 });
 
