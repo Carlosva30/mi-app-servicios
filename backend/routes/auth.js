@@ -3,22 +3,20 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Usuario = require('../models/Usuario');
 const verificarToken = require('../middleware/authMiddleware');
+const router = express.Router();
 require('dotenv').config();
 
-const router = express.Router();
-
-// Registro con contraseña encriptada
+// Registro
 router.post('/registro', async (req, res) => {
   try {
-    const { nombre, correo, contraseña, tipoUsuario } = req.body;
-
-    const contraseñaHasheada = await bcrypt.hash(contraseña, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashed = await bcrypt.hash(req.body.contraseña, salt);
 
     const nuevoUsuario = new Usuario({
-      nombre,
-      correo,
-      contraseña: contraseñaHasheada,
-      tipoUsuario
+      nombre: req.body.nombre,
+      correo: req.body.correo,
+      contraseña: hashed,
+      tipoUsuario: req.body.tipoUsuario
     });
 
     await nuevoUsuario.save();
@@ -28,55 +26,25 @@ router.post('/registro', async (req, res) => {
   }
 });
 
-// Login con verificación segura
+// Login
 router.post('/login', async (req, res) => {
   const { correo, contraseña } = req.body;
   try {
     const usuario = await Usuario.findOne({ correo });
-    if (!usuario) {
-      return res.status(401).json({ mensaje: 'Correo no encontrado' });
-    }
+    if (!usuario) return res.status(401).json({ mensaje: 'Usuario no encontrado' });
 
     const esValida = await bcrypt.compare(contraseña, usuario.contraseña);
-    if (!esValida) {
-      return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
-    }
+    if (!esValida) return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
 
-    const token = jwt.sign(
-      {
-        id: usuario._id,
-        correo: usuario.correo,
-        tipoUsuario: usuario.tipoUsuario
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '2h' }
-    );
+    const token = jwt.sign({
+      id: usuario._id,
+      correo: usuario.correo,
+      tipoUsuario: usuario.tipoUsuario
+    }, process.env.JWT_SECRET, { expiresIn: '2h' });
 
     res.json({ token, usuario, tipoUsuario: usuario.tipoUsuario });
   } catch (error) {
     res.status(500).json({ mensaje: 'Error en el login', error });
-  }
-});
-
-// Obtener usuario por ID
-router.get('/:id', verificarToken, async (req, res) => {
-  try {
-    const usuario = await Usuario.findById(req.params.id);
-    if (!usuario) return res.status(404).json({ mensaje: 'Usuario no encontrado' });
-    res.json(usuario);
-  } catch (error) {
-    res.status(500).json({ mensaje: 'Error al buscar el usuario', error });
-  }
-});
-
-// Actualizar perfil del usuario
-router.put('/:id', verificarToken, async (req, res) => {
-  try {
-    const actualizado = await Usuario.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!actualizado) return res.status(404).json({ mensaje: 'Usuario no encontrado' });
-    res.json(actualizado);
-  } catch (error) {
-    res.status(500).json({ mensaje: 'Error al actualizar perfil', error });
   }
 });
 

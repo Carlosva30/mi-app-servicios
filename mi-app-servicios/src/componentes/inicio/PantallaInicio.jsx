@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../../api/axios'; //  usa instancia con token
 
 const CATEGORIAS = [
   { nombre: 'Plomería', icono: '🛠️' },
@@ -7,12 +7,6 @@ const CATEGORIAS = [
   { nombre: 'Limpieza', icono: '🧼' },
   { nombre: 'Belleza', icono: '🌸' }
 ];
-
-const formatoPesos = new Intl.NumberFormat('es-CO', {
-  style: 'currency',
-  currency: 'COP',
-  minimumFractionDigits: 0
-});
 
 function PantallaInicio({ onCotizar }) {
   const [busqueda, setBusqueda] = useState('');
@@ -22,53 +16,42 @@ function PantallaInicio({ onCotizar }) {
   useEffect(() => {
     const obtenerExpertos = async () => {
       try {
-        //  Obtener los expertos reales
-        const res = await axios.get('https://backend-nowservices.onrender.com/api/usuarios');
+        const res = await axios.get('/auth'); // Ruta que retorna solo expertos
         setExpertos(res.data);
         setFiltrados(res.data);
       } catch (error) {
         console.error('❌ Error al obtener expertos:', error);
       }
     };
-
     obtenerExpertos();
   }, []);
 
   useEffect(() => {
     const texto = busqueda.toLowerCase();
-    const filtrados = expertos.filter(experto =>
-      experto.nombre.toLowerCase().includes(texto) ||
-      (experto.tipoUsuario && experto.tipoUsuario.toLowerCase().includes(texto))
+    const resultados = expertos.filter(exp =>
+      exp.nombre.toLowerCase().includes(texto) ||
+      exp.tipoUsuario.toLowerCase().includes(texto)
     );
-    setFiltrados(filtrados);
+    setFiltrados(resultados);
   }, [busqueda, expertos]);
 
   return (
     <div style={{ backgroundColor: '#1e318a', minHeight: '100vh', color: 'white', padding: '20px' }}>
-      <div style={{ backgroundColor: 'white', borderRadius: '20px', padding: '10px', marginBottom: '15px' }}>
-        <input
-          type="text"
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          placeholder="¿Qué servicio necesitas?"
-          style={{ width: '100%', padding: '12px', borderRadius: '10px', border: 'none', fontSize: '16px' }}
-        />
-      </div>
+      <input
+        type="text"
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+        placeholder="¿Qué servicio necesitas?"
+        style={{ width: '100%', padding: '12px', borderRadius: '10px', border: 'none', fontSize: '16px' }}
+      />
 
-      <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px' }}>
-        {CATEGORIAS.map((cat, index) => (
-          <div key={index} style={{ textAlign: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-around', margin: '20px 0' }}>
+        {CATEGORIAS.map((cat, i) => (
+          <div key={i} style={{ textAlign: 'center' }}>
             <div style={{
-              backgroundColor: 'white',
-              borderRadius: '50%',
-              width: '60px',
-              height: '60px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '28px',
-              color: '#1e318a',
-              margin: '0 auto'
+              backgroundColor: 'white', borderRadius: '50%', width: '60px', height: '60px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '28px', color: '#1e318a', margin: '0 auto'
             }}>
               {cat.icono}
             </div>
@@ -77,16 +60,12 @@ function PantallaInicio({ onCotizar }) {
         ))}
       </div>
 
-      <h3 style={{ marginTop: '20px', marginBottom: '10px' }}>Expertos Recomendados</h3>
+      <h3>Expertos Recomendados</h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         {filtrados.map((experto) => (
           <div key={experto._id} style={{
-            backgroundColor: 'white',
-            borderRadius: '15px',
-            padding: '10px',
-            color: '#1e318a',
-            display: 'flex',
-            alignItems: 'center',
+            backgroundColor: 'white', borderRadius: '15px', padding: '10px',
+            color: '#1e318a', display: 'flex', alignItems: 'center',
             justifyContent: 'space-between'
           }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -97,15 +76,12 @@ function PantallaInicio({ onCotizar }) {
               />
               <div>
                 <strong>{experto.nombre}</strong>
-                <div>{formatoPesos.format(80000)}</div>
+                <div style={{ fontSize: '14px' }}>{experto.tipoUsuario}</div>
               </div>
             </div>
             <button onClick={() => onCotizar(experto)} style={{
-              backgroundColor: '#ff6600',
-              color: 'white',
-              border: 'none',
-              padding: '10px 15px',
-              borderRadius: '10px'
+              backgroundColor: '#ff6600', color: 'white',
+              border: 'none', padding: '10px 15px', borderRadius: '10px'
             }}>
               Solicitar
             </button>
@@ -117,6 +93,7 @@ function PantallaInicio({ onCotizar }) {
 }
 
 export default PantallaInicio;
+
 
 
 

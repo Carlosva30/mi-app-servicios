@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from '../../api/axios';
 
 const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
   const [estado, setEstado] = useState(true);
@@ -7,7 +8,7 @@ const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
 
   const [form, setForm] = useState({
     nombre: '',
-    servicio: '',
+    tipoUsuario: '',
     zona: 'Cali - Sur',
     contacto: '300 000 0000'
   });
@@ -20,7 +21,7 @@ const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
         setUsuario(user);
         setForm({
           nombre: user.nombre || '',
-          servicio: user.tipoUsuario || '',
+          tipoUsuario: user.tipoUsuario || '',
           zona: 'Cali - Sur',
           contacto: '300 000 0000'
         });
@@ -37,17 +38,8 @@ const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
 
   const guardarCambios = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`https://backend-nowservices.onrender.com/api/auth/${usuario._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(form)
-      });
-
-      const actualizado = await res.json();
+      const res = await axios.put(`/usuarios/${usuario._id}`, form);
+      const actualizado = res.data;
       localStorage.setItem('usuario', JSON.stringify(actualizado));
       setUsuario(actualizado);
       setEditando(false);
@@ -67,13 +59,7 @@ const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
             name="nombre"
             value={form.nombre}
             onChange={handleChange}
-            style={{
-              padding: '8px',
-              border: '1px solid #ccc',
-              borderRadius: '5px',
-              color: '#1e318a',
-              marginTop: '10px'
-            }}
+            style={estiloInput}
           />
         ) : (
           <h3>{usuario.nombre || 'Nombre no disponible'}</h3>
@@ -82,9 +68,9 @@ const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
       </div>
 
       <div style={{ backgroundColor: 'white', borderRadius: '15px', padding: '15px', color: '#1e318a' }}>
-        <p><strong>Servicio:</strong> {editando ? (
-          <input name="servicio" value={form.servicio} onChange={handleChange} style={estiloInput} />
-        ) : form.servicio}</p>
+        <p><strong>Especialidad:</strong> {editando ? (
+          <input name="tipoUsuario" value={form.tipoUsuario} onChange={handleChange} style={estiloInput} />
+        ) : form.tipoUsuario}</p>
 
         <p><strong>Zona de cobertura:</strong> {editando ? (
           <input name="zona" value={form.zona} onChange={handleChange} style={estiloInput} />
@@ -177,6 +163,3 @@ const botonEditar = {
 };
 
 export default PantallaPerfilExperto;
-
-
-
