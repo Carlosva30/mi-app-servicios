@@ -43,6 +43,7 @@ function Login({ onLoginExitoso, onRegistro }) {
         value={contraseña}
         onChange={(e) => setContraseña(e.target.value)}
       />
+      <button onClick={() => onRegistro('recuperar')}>¿Olvidaste tu contraseña?</button>
       <button onClick={manejarLogin}>Ingresar</button>
       <button onClick={onRegistro}>Registrarse</button>
       {error && <p style={{ color: 'red' }}>{error}</p>}

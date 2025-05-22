@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Login from './componentes/auth/Login';
 import PantallaRegistro from './componentes/auth/PantallaRegistro';
 import PantallaPerfilExperto from './componentes/perfiles/PantallaPerfilExperto';
+import PantallaRecuperarContraseña from './componentes/auth/PantallaRecuperarContraseña';
 
 import PantallaInicio from './componentes/inicio/PantallaInicio';
 import PantallaFinal from './componentes/inicio/PantallaFinal';
@@ -33,20 +34,25 @@ function App() {
   return (
     <div className="App">
 
-      {/* LOGIN */}
-      {pantalla === 'login' && (
-        <Login
-          onRegistro={() => setPantalla('registro')}
-          onLoginExitoso={() => {
-            const tipoUsuario = localStorage.getItem('tipoUsuario');
-            if (tipoUsuario === 'experto') {
-              setPantalla('perfilExperto');
-            } else {
-              setPantalla('inicio');
-            }
-          }}
-        />
-      )}
+     {pantalla === 'login' && (
+       <Login
+         onRegistro={(tipo) => {
+          if (tipo === 'recuperar') {
+           setPantalla('recuperar');
+      } else {
+         setPantalla('registro');
+      }
+    }}
+     onLoginExitoso={() => {
+      const tipoUsuario = localStorage.getItem('tipoUsuario');
+      if (tipoUsuario === 'experto') {
+        setPantalla('perfilExperto');
+      } else {
+        setPantalla('inicio');
+      }
+    }}
+  />
+)}
 
       {/* PANTALLA DE INICIO */}
       {pantalla === 'inicio' && (
@@ -58,6 +64,11 @@ function App() {
           onVerSolicitudes={() => setPantalla('verSolicitudes')}
           onLogout={() => setPantalla('login')}
         />
+      )}
+
+      {/* PANTALLA RECUPERAR CONTRASEÑA */}
+      {pantalla === 'recuperar' && (
+        <PantallaRecuperarContraseña onVolver={() => setPantalla('login')} />
       )}
 
       {/* COTIZAR */}
