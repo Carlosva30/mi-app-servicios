@@ -11,10 +11,9 @@ function PantallaRecuperarContraseña({ onVolver }) {
       return;
     }
 
-    //  ruta backend que envíe un correo real
     try {
-      // Simulación
-      setMensaje('📧 Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.');
+      const res = await axios.post('/auth/recuperar', { correo });
+      setMensaje(res.data.mensaje || 'Correo enviado correctamente');
     } catch (err) {
       console.error(err);
       setMensaje('❌ Error al intentar recuperar la contraseña.');
