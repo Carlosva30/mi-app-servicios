@@ -1,26 +1,34 @@
 const mongoose = require('mongoose');
 
 const solicitudSchema = new mongoose.Schema({
-  email: {
+  servicio: String,
+  descripcion: String,
+  valorPropuesto: Number,
+  email: String,
+  expertoId: String,
+  estado: {
     type: String,
-    required: true
+    default: 'pendiente',
+    enum: [
+      'pendiente',         // aún sin respuesta
+      'aceptada',          // el experto acepta
+      'rechazada',         // el experto rechaza
+      'realizada_cliente', // cliente marca como realizado
+      'realizada_experto', // experto marca como realizado
+      'completada'         // ambos marcaron como realizado
+    ]
   },
-  servicio: {
-    type: String,
-    required: true
+  clienteConfirmo: {
+    type: Boolean,
+    default: false
   },
-  descripcion: {
-    type: String,
-    required: true
+  expertoConfirmo: {
+    type: Boolean,
+    default: false
   },
   fecha: {
     type: Date,
     default: Date.now
-  },
-  usuario: { // Aquí está el vínculo con el usuario autenticado
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Usuario',
-    required: true
   }
 });
 
