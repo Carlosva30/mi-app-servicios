@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import axios from '../../api/axios';
 
 const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
-  const [estado, setEstado] = useState(true);
   const [usuario, setUsuario] = useState({});
   const [editando, setEditando] = useState(false);
+  const [mensaje, setMensaje] = useState('');
 
   const [form, setForm] = useState({
     nombre: '',
     tipoUsuario: '',
     zona: 'Cali - Sur',
-    contacto: '300 000 0000'
+    contacto: '300 000 0000',
+    estado: true
   });
 
   useEffect(() => {
@@ -22,8 +23,9 @@ const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
         setForm({
           nombre: user.nombre || '',
           tipoUsuario: user.tipoUsuario || '',
-          zona: 'Cali - Sur',
-          contacto: '300 000 0000'
+          zona: user.zona || 'Cali - Sur',
+          contacto: user.contacto || '300 000 0000',
+          estado: user.estado !== undefined ? user.estado : true
         });
       }
     } catch (e) {
@@ -32,8 +34,11 @@ const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setForm(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
 
   const guardarCambios = async () => {
@@ -43,8 +48,10 @@ const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
       localStorage.setItem('usuario', JSON.stringify(actualizado));
       setUsuario(actualizado);
       setEditando(false);
+      setMensaje('✅ Perfil actualizado correctamente');
     } catch (error) {
       console.error('Error actualizando perfil:', error);
+      setMensaje('❌ Hubo un error al guardar los cambios');
     }
   };
 
@@ -53,7 +60,11 @@ const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
       <h2 style={{ textAlign: 'center' }}>Perfil del Experto</h2>
 
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Foto" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+        <img
+          src="https://randomuser.me/api/portraits/men/75.jpg"
+          alt="Foto"
+          style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+        />
         {editando ? (
           <input
             name="nombre"
@@ -84,10 +95,18 @@ const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
 
         <div style={{ marginTop: '10px' }}>
           <strong>Estado:</strong>
-          <label style={{ marginLeft: '10px' }}>
-            <input type="checkbox" checked={estado} onChange={() => setEstado(!estado)} />
-            {estado ? ' Disponible' : ' Ocupado'}
-          </label>
+          {editando ? (
+            <label style={{ marginLeft: '10px' }}>
+              <input
+                type="checkbox"
+                name="estado"
+                checked={form.estado}
+                onChange={handleChange}
+              /> {form.estado ? ' Disponible' : ' Ocupado'}
+            </label>
+          ) : (
+            <span style={{ marginLeft: '10px' }}>{form.estado ? 'Disponible' : 'Ocupado'}</span>
+          )}
         </div>
       </div>
 
@@ -100,6 +119,7 @@ const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
         ) : (
           <button onClick={() => setEditando(true)} style={botonEditar}>Editar perfil</button>
         )}
+        {mensaje && <p style={{ marginTop: '10px', fontWeight: 'bold', color: mensaje.startsWith('✅') ? 'lightgreen' : 'salmon' }}>{mensaje}</p>}
       </div>
 
       <div style={{ marginTop: '30px' }}>
@@ -120,7 +140,7 @@ const PantallaPerfilExperto = ({ onVerSolicitudes, onLogout }) => {
         <button onClick={() => {
           localStorage.clear();
           onLogout();
-        }} style={{ padding: '10px 20px', backgroundColor: '#d32f2f', color: 'white' }}>
+        }} style={{ padding: '10px 20px', backgroundColor: '#d32f2f', color: 'white', border: 'none', borderRadius: '10px' }}>
           Cerrar sesión
         </button>
       </div>
@@ -163,3 +183,4 @@ const botonEditar = {
 };
 
 export default PantallaPerfilExperto;
+

@@ -5,9 +5,15 @@ function PantallaCotizar({ experto, onEnviarCotizacion, onVolver }) {
   const [descripcion, setDescripcion] = useState('');
   const [valor, setValor] = useState('');
   const [mensaje, setMensaje] = useState('');
+  const [cargando, setCargando] = useState(false);
 
   const manejarEnvio = async (e) => {
     e.preventDefault();
+
+    if (!descripcion || !valor || parseInt(valor) <= 0) {
+      setMensaje('❗ Ingresa una descripción y un valor válido');
+      return;
+    }
 
     const cotizacion = {
       expertoId: experto._id || experto.id,
@@ -17,16 +23,19 @@ function PantallaCotizar({ experto, onEnviarCotizacion, onVolver }) {
     };
 
     try {
-      await axios.post('/cotizaciones', cotizacion); // se envía al backend con token automáticamente
+      setCargando(true);
+      await axios.post('/cotizaciones', cotizacion);
       setMensaje('✅ Cotización enviada correctamente');
 
       if (onEnviarCotizacion) {
-        onEnviarCotizacion(cotizacion); // cambia de pantalla
+        onEnviarCotizacion(cotizacion);
       }
 
     } catch (error) {
       console.error('❌ Error al enviar la cotización:', error);
       setMensaje('❌ Error al enviar la cotización');
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -56,14 +65,20 @@ function PantallaCotizar({ experto, onEnviarCotizacion, onVolver }) {
         />
         <br />
 
-        <button type="submit" style={{ padding: '10px 20px' }}>Enviar Cotización</button>
+        <button type="submit" style={{ padding: '10px 20px' }} disabled={cargando}>
+          {cargando ? 'Enviando...' : 'Enviar Cotización'}
+        </button>
         <br /><br />
         <button type="button" onClick={onVolver} style={{ padding: '10px 20px' }}>
           Volver
         </button>
 
         {mensaje && (
-          <p style={{ marginTop: '15px', fontWeight: 'bold', color: mensaje.startsWith('✅') ? 'green' : 'red' }}>
+          <p style={{
+            marginTop: '15px',
+            fontWeight: 'bold',
+            color: mensaje.startsWith('✅') ? 'green' : 'red'
+          }}>
             {mensaje}
           </p>
         )}
@@ -73,3 +88,4 @@ function PantallaCotizar({ experto, onEnviarCotizacion, onVolver }) {
 }
 
 export default PantallaCotizar;
+

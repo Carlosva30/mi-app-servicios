@@ -8,9 +8,13 @@ function PantallaSolicitudesRecibidas({ onVolver }) {
     const obtenerSolicitudes = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('https://backend-nowservices.onrender.com/api/solicitudes', {
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+        const expertoId = usuario._id;
+
+        const res = await axios.get(`https://backend-nowservices.onrender.com/api/solicitudes?expertoId=${expertoId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
+
         setSolicitudes(res.data.solicitudes || []);
       } catch (error) {
         console.error('Error obteniendo solicitudes:', error);
@@ -22,8 +26,17 @@ function PantallaSolicitudesRecibidas({ onVolver }) {
 
   const marcarComoRealizada = async (id) => {
     try {
-      // Simulamos cambio de estado (puedes hacer un PUT en el backend real)
-      alert(`Solicitud ${id} marcada como realizada (simulado)`);
+      const token = localStorage.getItem('token');
+
+      await axios.put(`https://backend-nowservices.onrender.com/api/solicitudes/${id}`, {
+        estado: 'realizada'
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setSolicitudes(prev =>
+        prev.map(s => s._id === id ? { ...s, estado: 'realizada' } : s)
+      );
     } catch (error) {
       console.error('Error actualizando solicitud:', error);
     }
@@ -42,12 +55,21 @@ function PantallaSolicitudesRecibidas({ onVolver }) {
             <p><strong>Descripción:</strong> {solicitud.descripcion}</p>
             <p><strong>Cliente:</strong> {solicitud.email}</p>
             <p><strong>Fecha:</strong> {new Date(solicitud.fecha).toLocaleDateString()}</p>
+            <p><strong>Estado:</strong> {solicitud.estado || 'pendiente'}</p>
 
             <button
               onClick={() => marcarComoRealizada(solicitud._id)}
-              style={{ padding: '8px 15px', backgroundColor: '#ff6600', color: 'white', border: 'none', borderRadius: '8px' }}
+              disabled={solicitud.estado === 'realizada'}
+              style={{
+                padding: '8px 15px',
+                backgroundColor: solicitud.estado === 'realizada' ? '#6c757d' : '#ff6600',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: solicitud.estado === 'realizada' ? 'not-allowed' : 'pointer'
+              }}
             >
-              Marcar como realizada
+              {solicitud.estado === 'realizada' ? 'Ya realizada' : 'Marcar como realizada'}
             </button>
           </div>
         ))
@@ -66,3 +88,4 @@ function PantallaSolicitudesRecibidas({ onVolver }) {
 }
 
 export default PantallaSolicitudesRecibidas;
+

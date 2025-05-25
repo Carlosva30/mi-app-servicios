@@ -10,7 +10,6 @@ import PantallaFinal from './componentes/inicio/PantallaFinal';
 
 import PantallaCotizar from './componentes/servicios/PantallaCotizar';
 import PantallaServicios from './componentes/servicios/PantallaServicios';
-import PantallaSolicitud from './componentes/servicios/PantallaSolicitud';
 import PantallaSolicitudesGuardadas from './componentes/servicios/PantallaSolicitudesGuardadas';
 import PantallaSeguimiento from './componentes/servicios/PantallaSeguimiento';
 import PantallaSolicitudesRecibidas from './componentes/servicios/PantallaSolicitudesRecibidas';
@@ -34,25 +33,27 @@ function App() {
   return (
     <div className="App">
 
-     {pantalla === 'login' && (
-       <Login
-         onRegistro={(tipo) => {
-          if (tipo === 'recuperar') {
-           setPantalla('recuperar');
-      } else {
-         setPantalla('registro');
-      }
-    }}
-     onLoginExitoso={() => {
-      const tipoUsuario = localStorage.getItem('tipoUsuario');
-      if (tipoUsuario === 'experto') {
-        setPantalla('perfilExperto');
-      } else {
-        setPantalla('inicio');
-      }
-    }}
-  />
-)}
+      {pantalla === 'login' && (
+        <Login
+          onRegistro={(tipo) => {
+            if (tipo === 'recuperar') {
+              setPantalla('recuperar');
+            } else {
+              setPantalla('registro');
+            }
+          }}
+          onLoginExitoso={(tipoUsuario) => {
+            if (tipoUsuario === 'experto') {
+              setPantalla('perfilExperto');
+            } else if (tipoUsuario === 'cliente') {
+              setPantalla('inicio');
+            } else {
+              console.warn('Tipo de usuario no reconocido:', tipoUsuario);
+              setPantalla('login');
+            }
+          }}
+        />
+      )}
 
       {/* PANTALLA DE INICIO */}
       {pantalla === 'inicio' && (
@@ -114,16 +115,6 @@ function App() {
         />
       )}
 
-      {/* DESCRIPCIÓN DE LA SOLICITUD */}
-      {pantalla === 'solicitud' && (
-        <PantallaSolicitud
-          email={email}
-          servicio={servicio}
-          setDescripcion={setDescripcion}
-          onConfirmar={() => setPantalla('pago')}
-        />
-      )}
-
       {/* SOLICITUDES GUARDADAS */}
       {pantalla === 'verSolicitudes' && (
         <PantallaSolicitudesGuardadas onVolver={() => setPantalla('inicio')} />
@@ -153,3 +144,4 @@ function App() {
 }
 
 export default App;
+
