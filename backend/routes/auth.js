@@ -1,8 +1,7 @@
-// routes/auth.js
-const express       = require('express');
-const jwt           = require('jsonwebtoken');
-const nodemailer    = require('nodemailer');
-const Usuario       = require('../models/Usuario');
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const Usuario = require('../models/Usuario');
 const verificarToken = require('../middleware/authMiddleware');
 require('dotenv').config();
 
@@ -37,7 +36,6 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
     }
 
-    // Generar JWT
     const token = jwt.sign(
       { id: usuario._id, correo: usuario.correo, tipoUsuario: usuario.tipoUsuario },
       process.env.JWT_SECRET,
@@ -65,7 +63,16 @@ router.post('/recuperar', async (req, res) => {
       return res.status(404).json({ mensaje: 'Correo no registrado' });
     }
 
-    // Configurar transportador de Gmail (con App Password)
+    // ✅ Verificar que las variables estén definidas
+    if (!process.env.EMAIL_FROM || !process.env.EMAIL_PASS) {
+      console.error('❌ Faltan credenciales en .env');
+      return res.status(500).json({ mensaje: 'Error de configuración del servidor (correo).' });
+    }
+
+    console.log("📧 EMAIL_FROM:", process.env.EMAIL_FROM);
+    console.log("🔐 EMAIL_PASS:", process.env.EMAIL_PASS ? "SÍ definida" : "NO definida");
+
+    // ✅ Configurar transportador de Gmail
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -75,17 +82,18 @@ router.post('/recuperar', async (req, res) => {
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM,
+      from: `"Now Services" <${process.env.EMAIL_FROM}>`,
       to: correo,
       subject: 'Recuperación de contraseña - Now Services',
-      text: `Hola ${usuario.nombre},\n\nRecibimos una solicitud para recuperar tu contraseña.\n\nPor seguridad, contáctanos si no fuiste tú.\n\nEste es un ejemplo; pronto añadiremos un enlace real de recuperación.`
+      text: `Hola ${usuario.nombre || 'usuario'},\n\nRecibimos una solicitud para recuperar tu contraseña.\n\nPor seguridad, contáctanos si no fuiste tú.\n\nEste es un ejemplo; pronto añadiremos un enlace real de recuperación.`
     };
-    console.log('🚀 Enviando correo a:', correo);
 
+    console.log('🚀 Enviando correo a:', correo);
     await transporter.sendMail(mailOptions);
-    console.log('✅ Correo de recuperación enviado con éxito');
+    console.log('✅ Correo enviado con éxito');
 
     res.json({ mensaje: '📬 Correo enviado correctamente. Revisa tu bandeja de entrada.' });
+
   } catch (error) {
     console.error('❌ Error al enviar correo de recuperación:', error);
     res.status(500).json({ mensaje: '❌ Error al enviar correo de recuperación.' });
@@ -134,4 +142,5 @@ router.get('/', async (req, res) => {
 });
 
 module.exports = router;
+
 
